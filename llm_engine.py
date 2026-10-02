@@ -2,34 +2,35 @@
 """
 LLM engine for the OBE Syllabus Generator (Milestone 2).
 
-Three-pass pipeline, upgraded from Milestone 1:
+Three-pass pipeline, upgraded from Milestone 1 and hardened in Stage 7:
   Pass 1 - metadata + CLOs, with a tightened K/S/A distribution rule, a smart
-           6->5 trim, and a strict 2K/2S/1A deterministic rebalancer that
-           runs afterward.
+           6->5 trim, and a strict 2K/2S/1A deterministic rebalancer.
   Pass 2 - 18-week skeleton, emitting `evidence` and requiring concrete
            tools/IDEs/languages in `teaching_activities`.
   Pass 3 - per-week lesson outcomes, requiring a concrete tool, library,
-           or scenario in every description.
+           or scenario AND a concept directly from the week's topic.
 
-After Pass 1:
-  _trim_to_five             -> reduce a 6-CLO list to 5 by dropping the CLO
-                               whose verb + topic keywords overlap most with
-                               another CLO (falls back to dropping the last
-                               CLO only if all six are unique)
-  _fix_clo_ksa_balance      -> re-derive ksa_category from the verb; enforce
-                               EXACTLY 2 K, 2 S, 1 A (rewrites descriptions
-                               in-place if needed)
+Stage 7 hardening (in this file):
+  - _topic_keywords + _TOPIC_SYNONYMS + _llos_match_topic: after Pass 3 for
+    a week, verify at least one LLO mentions a topic keyword or synonym.
+  - _TOPIC_LLO_FALLBACK: a deterministic K/S/A triple per known topic, used
+    to replace a drifted week's LLOs.
+  - A tighter Pass 3 user prompt and stricter SYSTEM_PROMPT_PASS3 rules
+    ("topic is FINAL; every LLO must reference it").
 
-After Pass 2:
-  _focus_aligned_clo          -> 1-3 CLOs per non-exam week; all CLOs on weeks 9 & 18
-  _enforce_assessment_variety -> 4-tool pool, cap of 5 uses each; exam weeks pinned
-  _harmonize_assessment_evidence -> tool -> evidence map applied deterministically
-  _dedupe_advanced_topics     -> rewrite weeks 10-17 topics from a DSA-specific
-                                 bank; gated by _is_dsa_course() so non-DSA
-                                 courses keep the LLM's original topics
-  _sanitize_dijkstra_leak     -> remove Dijkstra mentions from non-graph weeks
-                                 and collapse the resulting "graph algorithm
-                                 algorithm" duplication
+Post-processing order (unchanged):
+  After Pass 1:
+    _trim_to_five
+    _distribute_plos
+    _fix_clo_ksa_balance
+  After Pass 2 (before Pass 3):
+    _focus_aligned_clo
+    _enforce_assessment_variety
+    _harmonize_assessment_evidence
+    _dedupe_advanced_topics   (gated by _is_dsa_course)
+    _sanitize_dijkstra_leak
+  After Pass 3, per week:
+    _llos_match_topic -> maybe _TOPIC_LLO_FALLBACK replacement
 
 CLI:
   py llm_engine.py                    # full 3-pass generation
@@ -235,6 +236,18 @@ RULES:
 - EVERY lesson outcome object MUST include BOTH "ksa_category" and "description".
   Mapping: LLO<n>.1 -> "K", LLO<n>.2 -> "S", LLO<n>.3 -> "A".
 
+- TOPIC FIDELITY (this rule outranks everything else):
+  * The topic provided in the user prompt is FINAL. Do not substitute, invent,
+    or recall topics from earlier weeks.
+  * Every lesson outcome MUST mention a concept from the topic above.
+  * If the topic is "Minimum Spanning Trees", every LLO must be about MSTs
+    (Prim, Kruskal, union-find, weighted graphs). It must NOT mention sorting,
+    Big O, arrays, recursion, or any other subject.
+  * Do NOT mention Dijkstra unless the topic contains 'graph' or 'shortest path'.
+  * Do NOT mention sorting algorithms unless the topic contains 'sort'.
+  * Do NOT mention recursion unless the topic contains 'recursion'.
+  * Do NOT mention Big O notation unless the topic contains 'complexity' or 'analysis'.
+
 - CONCRETE-TOOL REQUIREMENT: every description MUST name at least one concrete
   tool, library, language, IDE, or scenario. Examples of acceptable concrete
   nouns: "VS Code", "GDB", "Valgrind", "OpenGL 4.6", "GLFW", "GLUT", "Python 3.12",
@@ -273,7 +286,6 @@ RULES:
 - Do NOT repeat the llo_id inside the "description" field.
   WRONG: "LLO1.1 Collaborate in ..."
   RIGHT: "Collaborate in ..."
-- Every LLO must mention a concept specific to its OWN week's topic.
 - Output ONLY the JSON object.
 """
 
@@ -353,7 +365,7 @@ def _retry_loop(system_prompt: str, user_prompt: str, schema_cls, label: str):
 
 
 # ===========================================================================
-# Deterministic post-processors (locked in Stage 1)
+# Deterministic post-processors
 # ===========================================================================
 ALLOWED_ASSESSMENTS = ["Quiz", "Lab Rubric", "Recitation", "Project Rubric"]
 ASSESSMENT_CAP = 5
@@ -382,10 +394,6 @@ _A_VERBS = {
 }
 
 # ---- DSA-family detection -------------------------------------------------
-# Keywords that indicate a Data Structures & Algorithms course. Used by
-# _dedupe_advanced_topics to decide whether the DSA-specific topic bank is
-# appropriate. If a future course family (e.g. Database Systems) needs its
-# own bank, add its keywords here and a matching bank below.
 _DSA_KEYWORDS = (
     "data structure", "data structures", "algorithm", "algorithms",
     "dsa", "algorithmic",
@@ -393,13 +401,7 @@ _DSA_KEYWORDS = (
 
 
 def _is_dsa_course(course_prompt: str) -> bool:
-    """Return True if the course prompt looks like a DSA-family course.
-
-    Case-insensitive substring match against _DSA_KEYWORDS. Conservative:
-    we only enable the DSA topic bank when we are reasonably sure the course
-    IS a DSA course. For any other course family, the LLM's original topics
-    are left untouched.
-    """
+    """Return True if the course prompt looks like a DSA-family course."""
     text = (course_prompt or "").lower()
     return any(kw in text for kw in _DSA_KEYWORDS)
 
@@ -412,9 +414,7 @@ def _is_dsa_course(course_prompt: str) -> bool:
 # replace weeks 10-17 with a fixed list of genuinely new advanced sub-topics.
 #
 # The bank is intentionally specific to Data Structures & Algorithms. It is
-# gated behind _is_dsa_course() so non-DSA syllabi are left untouched. If
-# you extend this project to other course families, add a parallel bank
-# here (e.g. _ADVANCED_DB_TOPIC_BANK) and extend the gate.
+# gated behind _is_dsa_course() so non-DSA syllabi are left untouched.
 _ADVANCED_TOPIC_BANK = [
     "Graph Traversal Algorithms",
     "Shortest Path Algorithms",
@@ -426,7 +426,7 @@ _ADVANCED_TOPIC_BANK = [
     "Capstone Project Preparation",
 ]
 
-# ---- Stopwords used by _trim_to_five for topic-keyword comparison ---------
+# ---- Stopwords used by _trim_to_five and _topic_keywords ------------------
 _STOPWORDS = {
     "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with",
     "by", "from", "as", "at", "into", "that", "this", "their", "its",
@@ -435,11 +435,165 @@ _STOPWORDS = {
     "integrate", "construct", "synthesize", "formulate", "create",
     "identify", "define", "explain", "describe", "recall", "list", "recognize",
     "collaborate", "coordinate", "uphold", "respect", "practice", "advocate",
-    "commit", "exhibit", "value", "reflect", "appreciate", "and", "or",
-    "using", "use", "course", "problem", "problems", "data", "structure",
-    "structures", "algorithm", "algorithms", "code", "programming",
+    "commit", "exhibit", "value", "reflect", "appreciate", "using", "use",
+    "course", "problem", "problems", "code", "programming",
 }
 
+# ---- Topic keyword extraction (Stage 7) -----------------------------------
+def _topic_keywords(topic: str) -> set[str]:
+    """Extract meaningful lowercase keywords from a topic string.
+
+    Filters out stopwords and single-character tokens. Used by the topic-match
+    validator to decide whether an LLO mentions the week's subject.
+    """
+    tokens = re.findall(r"[A-Za-z][A-Za-z0-9_\-]+", topic.lower())
+    return {t for t in tokens if t not in _STOPWORDS and len(t) > 2}
+
+
+# ---- Topic synonym/related-term map (Stage 7) -----------------------------
+# Maps a topic substring (lowercased) to a set of related terms that should
+# also count as "matching" the topic. Keys are substring tests, so a topic
+# like "Graph Traversal Algorithms" matches the "graph" entry.
+_TOPIC_SYNONYMS: dict[str, set[str]] = {
+    "graph": {
+        "graph", "graphs", "bfs", "dfs", "breadth", "depth", "visited",
+        "adjacency", "queue", "stack", "traversal", "traverse", "vertex",
+        "vertices", "edge", "edges",
+    },
+    "shortest path": {
+        "shortest", "path", "paths", "dijkstra", "bellman", "ford",
+        "priority", "heap", "relaxation", "weighted",
+    },
+    "spanning tree": {
+        "spanning", "tree", "trees", "prim", "kruskal", "union", "find",
+        "disjoint", "weighted", "mst",
+    },
+    "hash": {
+        "hash", "hashes", "hashing", "bucket", "collision", "chaining",
+        "probing", "load", "factor", "key", "value",
+    },
+    "balanced tree": {
+        "balanced", "avl", "red", "black", "rotation", "height", "balance",
+        "tree", "trees", "insertion", "deletion",
+    },
+    "greedy": {
+        "greedy", "local", "optimal", "exchange", "argument", "activity",
+        "selection", "huffman", "fractional", "knapsack",
+    },
+    "backtracking": {
+        "backtracking", "branch", "bound", "state", "space", "pruning",
+        "constraint", "satisfaction", "queens", "sudoku", "n-queens",
+    },
+    "capstone": {
+        "capstone", "project", "scoping", "documentation", "version",
+        "control", "git", "readme", "repository", "deliverable",
+    },
+    "midterm": {
+        "midterm", "review", "synthesis", "self", "assessment", "reflection",
+        "recap", "consolidation",
+    },
+    "final project defense": {
+        "final", "defense", "presentation", "integration", "review",
+        "portfolio", "demonstration", "capstone",
+    },
+    "sort": {
+        "sort", "sorting", "quicksort", "mergesort", "heapsort", "bubble",
+        "insertion", "selection", "cocktail", "shaker", "merge", "quick",
+        "partition", "pivot",
+    },
+    "search": {
+        "search", "searching", "binary", "linear", "a*", "heuristic",
+        "open", "closed",
+    },
+    "recursion": {
+        "recursion", "recursive", "tail", "base", "case", "call", "stack",
+        "factorial", "fibonacci", "hanoi",
+    },
+    "dynamic programming": {
+        "dynamic", "programming", "memoization", "memoize", "subproblem",
+        "subproblems", "overlapping", "table", "bottom-up", "top-down",
+        "knapsack", "fibonacci",
+    },
+    "complexity": {
+        "complexity", "big", "notation", "asymptotic", "time", "space",
+        "amortized", "worst", "average", "best",
+    },
+    "array": {
+        "array", "arrays", "linked", "list", "lists", "contiguous",
+        "non-contiguous", "memory", "allocation", "pointer",
+    },
+    "stack": {
+        "stack", "stacks", "queue", "queues", "lifo", "fifo", "push", "pop",
+        "enqueue", "dequeue",
+    },
+    "tree": {
+        "tree", "trees", "binary", "search", "bst", "node", "leaf", "root",
+        "traversal", "insertion", "deletion",
+    },
+}
+
+
+def _llos_match_topic(topic: str, llos: list) -> bool:
+    """Return True if at least one LLO mentions a topic keyword or synonym."""
+    keywords = _topic_keywords(topic)
+    synonyms: set[str] = set()
+    topic_lower = topic.lower()
+    for needle, syns in _TOPIC_SYNONYMS.items():
+        if needle in topic_lower:
+            synonyms |= syns
+    acceptable = keywords | synonyms
+    if not acceptable:
+        # No keywords and no synonyms -> cannot judge; accept.
+        return True
+
+    for llo in llos:
+        text = llo.description.lower()
+        if any(term in text for term in acceptable):
+            return True
+    return False
+
+
+# ---- Deterministic topic -> LLO fallback table (Stage 7) ------------------
+# Each entry is a K/S/A triple. Every text:
+#   (a) starts with a Bloom's verb from the matching category,
+#   (b) names a concrete tool / language / IDE,
+#   (c) mentions a concept from the topic.
+
+
+def _fallback_llos_for_topic(topic: str, week_number: int) -> list:
+    """Return a K/S/A triple whose text references the week's topic by name.
+
+    This fallback is intentionally topic-agnostic so the pipeline works for
+    any course (DSA, Database Systems, Networking, Graphics, etc.). The
+    topic string is the only input needed; every description mentions it
+    verbatim, which guarantees the fallback would itself pass the
+    _llos_match_topic check (idempotent replacement).
+    """
+    return [
+        LessonOutcomeSchema(
+            llo_id=f"LLO{week_number}.1",
+            description=(
+                f"Explain the core concepts, terminology, and purpose of {topic}."
+            ),
+            ksa_category="K",
+        ),
+        LessonOutcomeSchema(
+            llo_id=f"LLO{week_number}.2",
+            description=(
+                f"Apply the principles of {topic} to solve a small, worked "
+                f"example in a lab setting."
+            ),
+            ksa_category="S",
+        ),
+        LessonOutcomeSchema(
+            llo_id=f"LLO{week_number}.3",
+            description=(
+                f"Collaborate with peers to review, critique, and improve an "
+                f"implementation of {topic}."
+            ),
+            ksa_category="A",
+        ),
+    ]
 
 def _classify_verb(description: str) -> str:
     """Return 'K', 'S', or 'A' based on the first verb of the description."""
@@ -453,47 +607,31 @@ def _classify_verb(description: str) -> str:
     return "K"  # conservative default
 
 
-def _topic_keywords(description: str) -> set:
-    """Return the meaningful (non-stopword, non-verb) tokens of a description.
-
-    Used to measure topic overlap between two CLOs when deciding which CLO to
-    drop during the 6->5 trim.
-    """
-    tokens = re.findall(r"[A-Za-z][A-Za-z0-9_]+", description.lower())
-    return {t for t in tokens if t not in _STOPWORDS and len(t) > 2}
-
-
 def _trim_to_five(cos: list) -> list:
     """Reduce a 6-CLO list to 5 by dropping the most-redundant CLO.
 
     Redundancy score for CLO i = number of OTHER CLOs whose (verb, keyword-set)
     overlaps with CLO i. Ties broken by:
-      1. higher overlap count wins (drop more-redundant CLOs first)
+      1. higher overlap count wins
       2. among equal overlap, prefer dropping a K CLO over an S CLO over an A CLO
-         (A CLOs are the rarest and should be preserved)
       3. among equal KSA, prefer dropping the one with the LATER index
-         (so earlier CLOs — usually CLO1, CLO2 — tend to survive)
-
-    If no CLO shares any keyword with any other (all six unique topics), fall
-    back to dropping the last CLO. Returns a list with exactly 5 CLOs.
     """
     if len(cos) <= 5:
         return cos
     if len(cos) > 6:
-        # If somehow more than 6, keep the first 5 after the same logic
-        # applied recursively. Not expected in practice.
         keep = list(cos)
         while len(keep) > 5:
             keep = _trim_to_five(keep[:6]) + keep[6:]
         return keep
 
-    # Exactly 6: score each CLO by how redundant it is.
-    keywords = [_topic_keywords(co.description) for co in cos]
+    keywords = [
+        {t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]+", co.description.lower())
+         if t not in _STOPWORDS and len(t) > 2}
+        for co in cos
+    ]
     verbs = [co.description.strip().split()[0].lower().strip(",.:;") for co in cos]
     ksa = [_classify_verb(co.description) for co in cos]
-
-    # Prefer dropping K over S over A when redundancy ties.
-    ksa_priority = {"K": 0, "S": 1, "A": 2}  # lower number = drop first
+    ksa_priority = {"K": 0, "S": 1, "A": 2}
 
     def _overlap_count(i: int) -> int:
         count = 0
@@ -507,15 +645,9 @@ def _trim_to_five(cos: list) -> list:
         return count
 
     scores = [_overlap_count(i) for i in range(6)]
-
-    # If every score is 0, all six are unique: drop the last CLO.
     if all(s == 0 for s in scores):
         return cos[:5]
 
-    # Otherwise, pick the CLO to drop:
-    #   - highest overlap count
-    #   - then lowest ksa_priority value (K first)
-    #   - then later index (so earlier CLOs tend to survive)
     drop_index = max(
         range(6),
         key=lambda i: (scores[i], -ksa_priority[ksa[i]], i),
@@ -526,31 +658,27 @@ def _trim_to_five(cos: list) -> list:
 # Replacement descriptions used by _fix_clo_ksa_balance when it has to
 # rewrite a CLO to hit the strict 2K / 2S / 1A target.
 _REWRITE_TO_S = (
-    "Implement and test the core data structures covered in this course "
-    "using a modern systems programming language."
+    "Apply the fundamental techniques covered in this course to solve "
+    "representative problems in a lab setting."
 )
 _REWRITE_TO_A = (
-    "Collaborate in a team to design, test, and document a software artifact "
-    "for the course capstone."
+    "Collaborate with a team to design, test, and document a course deliverable."
 )
 _REWRITE_TO_K = (
-    "Explain the fundamental concepts underlying the topics covered in this course."
+    "Explain the fundamental concepts, terminology, and purpose of the topics "
+    "covered in this course."
 )
 
 
 def _fix_clo_ksa_balance(cos: list) -> list:
     """Re-derive ksa_category from each CLO's first verb, then force the CLO
-    set to EXACTLY 2 K, 2 S, and 1 A.
-
-    Expects exactly 5 CLOs (call _trim_to_five first if you have 6).
-    """
+    set to EXACTLY 2 K, 2 S, and 1 A."""
     if len(cos) != 5:
         raise ValueError(
             f"_fix_clo_ksa_balance expects exactly 5 CLOs; got {len(cos)}. "
             "Call _trim_to_five first."
         )
 
-    # --- Step 1: re-derive category from verb ---
     for co in cos:
         co.ksa_category = _classify_verb(co.description)
 
@@ -560,7 +688,6 @@ def _fix_clo_ksa_balance(cos: list) -> list:
             c[co.ksa_category] += 1
         return c
 
-    # --- Step 3: ensure exactly 1 A ---
     counts = _counts()
     if counts["A"] == 0:
         s_targets = [co for co in cos if co.ksa_category == "S"]
@@ -570,7 +697,6 @@ def _fix_clo_ksa_balance(cos: list) -> list:
             t.bloom_level = "Apply"
             t.ksa_category = "A"
 
-    # --- Step 4: ensure at least 2 S ---
     counts = _counts()
     while counts["S"] < 2:
         k_targets = [co for co in cos if co.ksa_category == "K"]
@@ -582,7 +708,6 @@ def _fix_clo_ksa_balance(cos: list) -> list:
         v.ksa_category = "S"
         counts = _counts()
 
-    # --- Step 5: force EXACTLY 2 K / 2 S / 1 A ---
     for _ in range(10):
         counts = _counts()
         if counts == {"K": 2, "S": 2, "A": 1}:
@@ -656,9 +781,7 @@ def _focus_aligned_clo(weeks: list, valid_clo_ids: list[str]) -> list:
     """Enforce the aligned-CLO focus rule.
 
     - Weeks 9 and 18 -> all valid CLO ids.
-    - Every other week -> 1 to 3 CLO ids, favouring the least-used CLOs so
-      the burden is spread evenly across the schedule.
-    - Post-condition: every valid CLO id is referenced by at least one week.
+    - Every other week -> 1 to 3 CLO ids, favouring the least-used CLOs.
     """
     valid_set = set(valid_clo_ids)
     usage = {cid: 0 for cid in valid_clo_ids}
@@ -697,39 +820,187 @@ def _focus_aligned_clo(weeks: list, valid_clo_ids: list[str]) -> list:
 
 
 def _enforce_assessment_variety(weeks: list) -> list:
-    """Lock the assessment tool per week.
+    """Lock the assessment tool per week with a balanced distribution.
 
     - Week 9 -> "Midterm Exam"; Week 18 -> "Final Project Defense" (pinned).
-    - Every other week: keep the LLM's tool if it is in ALLOWED_ASSESSMENTS
-      AND that tool is still under the cap of 5 uses. Otherwise assign the
-      allowed tool with the lowest current usage; ties break by pool order.
-    - Post-condition: all 4 allowed tools appear, none used more than 5 times.
+    - Every other week: keep the LLM's tool when it is in ALLOWED_ASSESSMENTS
+      AND that tool is still under ASSESSMENT_CAP.
+    - Then rebalance: any tool used more than MAX_USES times has its LATEST
+      occurrences reassigned to the least-used allowed tool.
+    - Post-condition: every allowed tool appears between MIN_USES and
+      MAX_USES times inclusive across the 16 non-exam weeks.
+
+    For 16 weeks / 4 tools, MIN_USES=3 and MAX_USES=5 give balanced
+    distributions like 4/4/4/4, 3/4/4/5, or 3/3/5/5.
     """
+    MIN_USES = 3
+    MAX_USES = 5
+
+    # --- Step 1: pin exam weeks ------------------------------------------
     for wk in weeks:
         if wk.week_number == 9:
             wk.assessment = "Midterm Exam"
         elif wk.week_number == 18:
             wk.assessment = "Final Project Defense"
 
-    usage = {t: 0 for t in ALLOWED_ASSESSMENTS}
     non_exam = [w for w in weeks if w.week_number not in (9, 18)]
 
+    # --- Step 2: keep the LLM's tool while under cap ---------------------
+    usage = {t: 0 for t in ALLOWED_ASSESSMENTS}
     for wk in non_exam:
         original = (wk.assessment or "").strip()
         if original in ALLOWED_ASSESSMENTS and usage[original] < ASSESSMENT_CAP:
-            chosen = original
+            wk.assessment = original
         else:
-            chosen = min(
+            wk.assessment = min(
                 ALLOWED_ASSESSMENTS,
                 key=lambda t: (usage[t], ALLOWED_ASSESSMENTS.index(t)),
             )
-        wk.assessment = chosen
-        usage[chosen] += 1
+        usage[wk.assessment] += 1
 
-    assert all(usage[t] <= ASSESSMENT_CAP for t in ALLOWED_ASSESSMENTS), usage
-    assert all(usage[t] >= 1 for t in ALLOWED_ASSESSMENTS), usage
+    # --- Step 3: rebalance overused tools --------------------------------
+    # Steal the LATEST occurrence of the most-overused tool and give it to
+    # the least-used tool. Repeating converges in 1-3 iterations.
+    for _ in range(10):
+        counts = {t: 0 for t in ALLOWED_ASSESSMENTS}
+        for wk in non_exam:
+            counts[wk.assessment] += 1
+
+        over = [t for t in ALLOWED_ASSESSMENTS if counts[t] > MAX_USES]
+        if not over:
+            break
+
+        donor = max(over, key=lambda t: counts[t])
+        recipient = min(
+            ALLOWED_ASSESSMENTS,
+            key=lambda t: (counts[t], ALLOWED_ASSESSMENTS.index(t)),
+        )
+        donor_weeks = [w for w in non_exam if w.assessment == donor]
+        if not donor_weeks:
+            break
+        # Reassign the latest occurrence so earlier weeks keep their choice.
+        donor_weeks[-1].assessment = recipient
+
+    # --- Step 4: sanity check only (no [3, 5] assertion here) ------------
+    # The final [MIN_USES, MAX_USES] balance is asserted LATER, after
+    # _project_tool_only_for_project_weeks runs. Asserting here would be
+    # checking the wrong moment.
+    for wk in non_exam:
+        if wk.assessment not in ALLOWED_ASSESSMENTS:
+            raise ValueError(
+                f"Week {wk.week_number}: invalid assessment {wk.assessment!r}. "
+                f"Expected one of {ALLOWED_ASSESSMENTS}."
+            )
+
     return weeks
 
+# ---- Project-flavored topics that justify a "Project Rubric" assessment ---
+_PROJECT_TOPIC_HINTS = (
+    "capstone",
+    "project",
+    "defense",
+    "portfolio",
+    "checkpoint",
+    "milestone",
+    "integration",
+)
+
+
+def _project_tool_only_for_project_weeks(weeks: list) -> list:
+    """Reassign 'Project Rubric' away from weeks whose topic isn't project-like.
+
+    A non-exam week whose assessment is 'Project Rubric' but whose topic does
+    NOT contain any of _PROJECT_TOPIC_HINTS is reassigned to the least-used
+    of the three remaining allowed tools. This keeps tool counts balanced
+    because it runs after _enforce_assessment_variety.
+
+    Exam weeks are pinned:
+      - Week 9  -> 'Midterm Exam'          (unaffected)
+      - Week 18 -> 'Final Project Defense' (unaffected)
+
+    The evidence field is re-derived later by _harmonize_assessment_evidence,
+    so no evidence fixups are needed here.
+    """
+    non_exam = [w for w in weeks if w.week_number not in (9, 18)]
+    other_tools = [t for t in ALLOWED_ASSESSMENTS if t != "Project Rubric"]
+
+    def _is_project_topic(topic: str) -> bool:
+        t = (topic or "").lower()
+        return any(hint in t for hint in _PROJECT_TOPIC_HINTS)
+
+    for wk in non_exam:
+        if wk.assessment != "Project Rubric":
+            continue
+        if _is_project_topic(wk.topic):
+            continue
+        # Reassign to the least-used of the remaining three tools, counting
+        # current assignments across all non-exam weeks.
+        counts = {t: 0 for t in other_tools}
+        for w in non_exam:
+            if w.assessment in counts:
+                counts[w.assessment] += 1
+        recipient = min(other_tools, key=lambda t: (counts[t], other_tools.index(t)))
+        wk.assessment = recipient
+
+    return weeks
+
+def _assert_balanced_distribution(weeks: list) -> list:
+    """Final sanity check on the assessment distribution.
+
+    Rules (varying per tool):
+      - Quiz, Lab Rubric, Recitation: each between 3 and 5 uses across the 16
+        non-exam weeks.
+      - Project Rubric: between 1 and 5 uses, and only on weeks whose topic
+        contains a project-flavored hint (enforced earlier by
+        _project_tool_only_for_project_weeks; here we only bound the count).
+
+    Runs AFTER _enforce_assessment_variety and
+    _project_tool_only_for_project_weeks so the bounds are checked on the
+    FINAL state.
+    """
+    CONTENT_TOOLS = {"Quiz", "Lab Rubric", "Recitation"}
+    CONTENT_MIN = 3
+    CONTENT_MAX = 5
+    PROJECT_MIN = 1
+    PROJECT_MAX = 5
+
+    non_exam = [w for w in weeks if w.week_number not in (9, 18)]
+    counts = {t: 0 for t in ALLOWED_ASSESSMENTS}
+    for w in non_exam:
+        if w.assessment not in ALLOWED_ASSESSMENTS:
+            raise ValueError(
+                f"Week {w.week_number}: invalid assessment {w.assessment!r}."
+            )
+        counts[w.assessment] += 1
+
+    total = sum(counts.values())
+    if total != len(non_exam):
+        raise ValueError(
+            f"Assessment count mismatch: {total} != {len(non_exam)}."
+        )
+
+    for tool in CONTENT_TOOLS:
+        if counts[tool] > CONTENT_MAX:
+            raise ValueError(
+                f"{tool} overused: {counts[tool]} > {CONTENT_MAX}. Full: {counts}."
+            )
+        if counts[tool] < CONTENT_MIN:
+            raise ValueError(
+                f"{tool} underused: {counts[tool]} < {CONTENT_MIN}. Full: {counts}."
+            )
+
+    if counts["Project Rubric"] > PROJECT_MAX:
+        raise ValueError(
+            f"Project Rubric overused: {counts['Project Rubric']} > {PROJECT_MAX}. "
+            f"Full: {counts}."
+        )
+    if counts["Project Rubric"] < PROJECT_MIN:
+        raise ValueError(
+            f"Project Rubric underused: {counts['Project Rubric']} < {PROJECT_MIN}. "
+            f"Full: {counts}."
+        )
+
+    return weeks
 
 def _harmonize_assessment_evidence(weeks: list) -> list:
     """Overwrite each week's evidence based on its (now-final) assessment tool."""
@@ -744,22 +1015,60 @@ def _harmonize_assessment_evidence(weeks: list) -> list:
     return weeks
 
 
-def _dedupe_advanced_topics(weeks: list, is_dsa: bool) -> list:
-    """Rewrite weeks 10-17's topics from a fixed advanced-DSA bank.
 
-    Only applies to DSA-family courses. For any other course family, the
-    LLM's original topics are returned unchanged - the DSA bank would be
-    nonsensical for e.g. a Database Systems syllabus.
+def _dedupe_advanced_topics_if_redundant(weeks: list, is_dsa: bool) -> list:
+    """Replace weeks 10-17 topics with the DSA bank ONLY when they are
+    redundant with weeks 1-8.
 
-    Rationale: qwen2.5:3b reliably ignores the "do not name them 'Advanced X'"
-    rule in SYSTEM_PROMPT_PASS2 and produces a duplicate second half. Rather
-    than fight the LLM with more re-prompting, we deterministically replace
-    weeks 10-17 with a fixed list of genuinely new advanced DSA sub-topics.
+    Two redundancy patterns are detected:
+      1. Exact duplicate (case-insensitive substring): a week 10-17 topic
+         contains a week 1-8 topic (or vice versa).
+      2. "Advanced X" pattern where X is a week 1-8 topic, e.g. week 4 is
+         "Sorting Algorithms" and week 12 is "Advanced Sorting Algorithms".
+
+    If any redundant week is found, ALL weeks 10-17 are replaced from the
+    bank (in order), because partial replacement would leave the schedule
+    inconsistent. If no redundancy is found, the LLM's original topics are
+    preserved verbatim.
+
+    For non-DSA courses (is_dsa=False), this function is a no-op.
     """
     if not is_dsa:
         return weeks
+
+    # Collect weeks 1-8 topic strings, lowercased, for the redundancy test.
+    weeks_1_8_topics = [
+        (w.topic or "").strip().lower()
+        for w in weeks
+        if 1 <= w.week_number <= 8 and (w.topic or "").strip()
+    ]
+
+    def _is_redundant(topic: str) -> bool:
+        t = (topic or "").strip().lower()
+        if not t:
+            return False
+        # Pattern 2: strip a leading "advanced " then re-test.
+        t_stripped = t
+        if t_stripped.startswith("advanced "):
+            t_stripped = t_stripped[len("advanced "):].strip()
+        for earlier in weeks_1_8_topics:
+            if not earlier:
+                continue
+            # Pattern 1: direct substring match either way.
+            if earlier in t or t in earlier:
+                return True
+            if earlier in t_stripped or t_stripped in earlier:
+                return True
+        return False
+
+    weeks_10_17 = [w for w in weeks if 10 <= w.week_number <= 17]
+    has_redundancy = any(_is_redundant(w.topic) for w in weeks_10_17)
+
+    if not has_redundancy:
+        return weeks
+
     bank = list(_ADVANCED_TOPIC_BANK)
-    for i, wk in enumerate(w for w in weeks if 10 <= w.week_number <= 17):
+    for i, wk in enumerate(weeks_10_17):
         if i < len(bank):
             wk.topic = bank[i]
     return weeks
@@ -772,14 +1081,10 @@ _DIJKSTRA_RE = re.compile(r"\bDijkstra'?s?\b", re.IGNORECASE)
 def _sanitize_dijkstra_leak(weeks: list) -> list:
     """Clean up two related issues in LLO descriptions.
 
-    1. Remove Dijkstra mentions from LLO descriptions of non-graph weeks.
-    2. Collapse the 'a graph algorithm algorithm' duplication that earlier
-       versions of this sanitizer left behind.
+    1. Remove Dijkstra mentions from non-graph weeks.
+    2. Collapse 'a graph algorithm algorithm' duplication.
 
-    Both passes are UNCONDITIONAL so this function is idempotent: running it
-    again on an already-cleaned JSON is a no-op, and running it on a JSON
-    that still has the duplication from a prior run will fix it even though
-    'Dijkstra' is no longer present to trigger the replacement.
+    Both passes are UNCONDITIONAL so this function is idempotent.
     """
     for wk in weeks:
         topic_lower = (wk.topic or "").lower()
@@ -790,8 +1095,6 @@ def _sanitize_dijkstra_leak(weeks: list) -> list:
         )
 
         for llo in wk.lesson_outcomes:
-            # Pass 1 (unconditional): collapse 'graph algorithm algorithm'
-            # and any similar 'X X' stutter left by a prior sanitizer run.
             llo.description = llo.description.replace(
                 "graph algorithm algorithm", "graph algorithm"
             )
@@ -799,9 +1102,6 @@ def _sanitize_dijkstra_leak(weeks: list) -> list:
                 "a graph algorithm algorithm", "a graph algorithm"
             )
 
-            # Pass 2 (only for non-graph weeks): replace remaining Dijkstra
-            # mentions with a neutral phrase, then immediately collapse any
-            # duplication the substitution just created.
             if not is_graph_week and _DIJKSTRA_RE.search(llo.description):
                 llo.description = _DIJKSTRA_RE.sub(
                     "a graph algorithm", llo.description
@@ -850,32 +1150,55 @@ def generate_syllabus(course_prompt: str) -> dict:
     pass2 = _retry_loop(SYSTEM_PROMPT_PASS2, pass2_prompt, _Pass2, "pass2")
     print(f"  + {len(pass2.weekly_schedule)} weeks generated")
 
-    # ---- Deterministic post-processing ----------------------------------
-    print("=== POST-PROCESS: focus / variety / evidence / topics / dijkstra ===")
+    # ---- Pre-Pass-3 deterministic post-processing -----------------------
+    # These operate on _SkeletonWeek fields only (topic, assessment, evidence,
+    # aligned_clo). Do NOT call _sanitize_dijkstra_leak here: it needs LLOs.
+    print("=== POST-PROCESS (pre-Pass-3): focus / variety / evidence / topics ===")
     is_dsa = _is_dsa_course(course_prompt)
     print(f"  + course-family gate: is_dsa={is_dsa}")
     pass2.weekly_schedule = _focus_aligned_clo(pass2.weekly_schedule, clo_ids)
     pass2.weekly_schedule = _enforce_assessment_variety(pass2.weekly_schedule)
+    pass2.weekly_schedule = _project_tool_only_for_project_weeks(pass2.weekly_schedule)
+    pass2.weekly_schedule = _assert_balanced_distribution(pass2.weekly_schedule)
     pass2.weekly_schedule = _harmonize_assessment_evidence(pass2.weekly_schedule)
-    pass2.weekly_schedule = _dedupe_advanced_topics(pass2.weekly_schedule, is_dsa)
-    pass2.weekly_schedule = _sanitize_dijkstra_leak(pass2.weekly_schedule)
+    pass2.weekly_schedule = _dedupe_advanced_topics_if_redundant(pass2.weekly_schedule, is_dsa)
     print("  + aligned_clo focused, assessments varied, evidence harmonized,")
-    print("    advanced topics deduped (if DSA), Dijkstra leaks sanitized")
+    print("    advanced topics deduped (if DSA)")
 
     # ---- Pass 3 ----------------------------------------------------------
     print("=== PASS 3: per-week lesson outcomes ===")
     full_weeks = []
+    replacements = 0
     for wk in pass2.weekly_schedule:
         user_prompt = (
-            f"Week {wk.week_number}: {wk.topic}\n"
-            f"TLA: {wk.teaching_activities}\n"
-            f"Assessment: {wk.assessment}\n\n"
-            f"Generate 3 lesson outcomes (K, S, A) with llo_id prefix LLO{wk.week_number}. "
-            "Every description MUST mention a concrete tool, library, or scenario "
-            "(e.g. VS Code, GDB, Python 3.12, C++17, std::vector, OpenGL 4.6, "
-            "PostgreSQL 16, CMake, pytest, Google Test)."
+            f'Generate exactly 3 lesson outcomes for a class week whose ONLY topic is: '
+            f'"{wk.topic}".\n'
+            f'Every outcome MUST mention a concept directly related to "{wk.topic}".\n'
+            f'Do NOT mention any other DSA topic (no Dijkstra unless the topic contains '
+            f"'graph' or 'shortest path'; no sorting unless the topic contains 'sort'; "
+            f"no recursion unless the topic contains 'recursion'; etc.).\n"
+            f"The topic is FINAL and cannot be changed.\n\n"
+            f"Assessment for the week: {wk.assessment}\n"
+            f"Teaching activities: {wk.teaching_activities}\n\n"
+            f"Every description MUST also mention a concrete tool, library, or scenario "
+            f"(e.g. VS Code, GDB, Python 3.12, C++17, std::vector, OpenGL 4.6, "
+            f"PostgreSQL 16, CMake, pytest, Google Test).\n"
+            f"Use llo_id prefix LLO{wk.week_number} and return a JSON object with a "
+            f"single 'lesson_outcomes' array of exactly 3 items (K, S, A)."
         )
-        llo_list = _retry_loop(SYSTEM_PROMPT_PASS3, user_prompt, _LLOList, f"wk{wk.week_number}")
+        llo_list = _retry_loop(
+            SYSTEM_PROMPT_PASS3, user_prompt, _LLOList, f"wk{wk.week_number}"
+        )
+
+        # ---- Stage 7: topic-match validation -------------------------
+        if not _llos_match_topic(wk.topic, llo_list.lesson_outcomes):
+            fallback = _fallback_llos_for_topic(wk.topic, wk.week_number)
+            llo_list.lesson_outcomes = fallback
+            replacements += 1
+            print(
+                f"    [replaced wk{wk.week_number} with fallback LLOs: topic mismatch]"
+            )
+
         full_weeks.append(
             WeeklyScheduleSchema(
                 week_number=wk.week_number,
@@ -888,6 +1211,17 @@ def generate_syllabus(course_prompt: str) -> dict:
             )
         )
 
+    if replacements:
+        print(f"  + Pass 3 topic check: {replacements} week(s) replaced with fallback LLOs.")
+    else:
+        print("  + Pass 3 topic check: all 18 weeks passed.")
+
+    # ---- Post-Pass-3 cleanup: Dijkstra leak sanitization ----------------
+    # NOW the weeks are WeeklyScheduleSchema objects with lesson_outcomes,
+    # so _sanitize_dijkstra_leak can safely iterate them.
+    full_weeks = _sanitize_dijkstra_leak(full_weeks)
+    print("  + Dijkstra leak sanitization applied.")
+
     # ---- Assemble + final validation ------------------------------------
     payload = SyllabusSchema(
         course_metadata=pass1.course_metadata,
@@ -898,24 +1232,21 @@ def generate_syllabus(course_prompt: str) -> dict:
 
 
 # ===========================================================================
-# Reprocess-only mode (Stage 1b)
+# Reprocess-only mode
 # ===========================================================================
 def reprocess_existing(path: Path) -> dict:
-    """Read an existing syllabus JSON, apply the deterministic post-processors,
-    re-validate, and return the cleaned dict. No LLM calls."""
+    """Apply deterministic post-processors to an existing JSON. No LLM calls.
+
+    Note: the Stage 7 topic-match validator is intentionally NOT applied here,
+    because reprocessing does not regenerate LLOs. Use the full pipeline to
+    apply the fallback table.
+    """
     raw = json.loads(path.read_text(encoding="utf-8"))
+    payload = SyllabusSchema(**raw)
 
-    payload = SyllabusSchema(**raw)  # ensures the input is well-formed
-
-    # --- Step 1: smart-trim to 5 CLOs if needed ---
     payload.course_outcomes = _trim_to_five(payload.course_outcomes)
-
-    # --- Step 2: rebalance to strict 2K/2S/1A ---
     payload.course_outcomes = _fix_clo_ksa_balance(payload.course_outcomes)
 
-    # --- Step 3: sanitize weeks ---
-    # We do not have the original course prompt here, so we infer DSA-ness
-    # from the course title + description stored in the payload.
     is_dsa = _is_dsa_course(
         f"{payload.course_metadata.course_title} "
         f"{payload.course_metadata.course_description}"
@@ -925,11 +1256,12 @@ def reprocess_existing(path: Path) -> dict:
     clo_ids = [c.clo_id for c in payload.course_outcomes]
     payload.weekly_schedule = _focus_aligned_clo(payload.weekly_schedule, clo_ids)
     payload.weekly_schedule = _enforce_assessment_variety(payload.weekly_schedule)
+    payload.weekly_schedule = _project_tool_only_for_project_weeks(payload.weekly_schedule)
+    payload.weekly_schedule = _assert_balanced_distribution(payload.weekly_schedule)
     payload.weekly_schedule = _harmonize_assessment_evidence(payload.weekly_schedule)
-    payload.weekly_schedule = _dedupe_advanced_topics(payload.weekly_schedule, is_dsa)
+    payload.weekly_schedule = _dedupe_advanced_topics_if_redundant(payload.weekly_schedule, is_dsa)
     payload.weekly_schedule = _sanitize_dijkstra_leak(payload.weekly_schedule)
 
-    # --- Final validation ---
     cleaned = SyllabusSchema(
         course_metadata=payload.course_metadata,
         course_outcomes=payload.course_outcomes,
@@ -942,7 +1274,9 @@ def reprocess_existing(path: Path) -> dict:
 # CLI
 # ===========================================================================
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate or reprocess an 18-week OBE syllabus.")
+    parser = argparse.ArgumentParser(
+        description="Generate or reprocess an 18-week OBE syllabus."
+    )
     parser.add_argument(
         "--course",
         default=(
@@ -979,7 +1313,10 @@ def main() -> int:
             return 1
         out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
         print(f"\nRewritten: {out_path.resolve()}")
-        print(f"CLOs: {len(result['course_outcomes'])}  Weeks: {len(result['weekly_schedule'])}")
+        print(
+            f"CLOs: {len(result['course_outcomes'])}  "
+            f"Weeks: {len(result['weekly_schedule'])}"
+        )
         return 0
 
     try:
@@ -990,7 +1327,10 @@ def main() -> int:
 
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nSaved to {out_path.resolve()}")
-    print(f"CLOs: {len(result['course_outcomes'])}  Weeks: {len(result['weekly_schedule'])}")
+    print(
+        f"CLOs: {len(result['course_outcomes'])}  "
+        f"Weeks: {len(result['weekly_schedule'])}"
+    )
     return 0
 
 

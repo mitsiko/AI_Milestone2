@@ -2,7 +2,7 @@
   "course_metadata": {
     "course_code": "CS201",
     "course_title": "Data Structures and Algorithms",
-    "course_description": "An in-depth study of fundamental data structures including arrays, linked lists, stacks, queues, trees, and graphs, as well as advanced algorithms such as sorting, searching, recursion, dynamic programming, and analysis of algorithmic complexity.",
+    "course_description": "An in-depth study of fundamental data structures and algorithms, including arrays, linked lists, stacks, queues, trees, graphs, sorting, searching, recursion, dynamic programming, and algorithmic complexity. Prerequisite: CS101.",
     "credits": 3,
     "prerequisites": [
       "CS101"
@@ -11,38 +11,38 @@
   "course_outcomes": [
     {
       "clo_id": "CLO1",
-      "description": "Identify the basic operations of arrays and their applications in problem-solving.",
+      "description": "Identify the operations supported by a binary search tree.",
       "bloom_level": "Remember",
       "ksa_category": "K",
       "mapped_plo": 1
     },
     {
       "clo_id": "CLO2",
-      "description": "Define the key components of linked lists and their use in data manipulation.",
+      "description": "Define the difference between contiguous and linked memory.",
       "bloom_level": "Remember",
       "ksa_category": "K",
       "mapped_plo": 2
     },
     {
-      "clo_id": "CLO3",
-      "description": "Implement and test the core data structures covered in this course using a modern systems programming language.",
-      "bloom_level": "Apply",
+      "clo_id": "CLO4",
+      "description": "Analyze the time complexity of quicksort in the worst case.",
+      "bloom_level": "Analyze",
       "ksa_category": "S",
       "mapped_plo": 3
     },
     {
       "clo_id": "CLO5",
-      "description": "Apply sorting algorithms to solve data organization problems.",
+      "description": "Demonstrate the use of dynamic programming to solve a problem.",
       "bloom_level": "Apply",
       "ksa_category": "S",
-      "mapped_plo": 5
+      "mapped_plo": 4
     },
     {
       "clo_id": "CLO6",
-      "description": "Collaborate in a team to design, test, and document a software artifact for the course capstone.",
-      "bloom_level": "Apply",
+      "description": "Exhibit respect for ethical considerations in algorithm design.",
+      "bloom_level": "Understand",
       "ksa_category": "A",
-      "mapped_plo": 6
+      "mapped_plo": 5
     }
   ],
   "weekly_schedule": [
@@ -52,50 +52,50 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO1.1",
-          "description": "Identify the basic characteristics of arrays and linked lists in Python 3.12 and describe their fundamental differences.",
+          "description": "Explain the core concepts, terminology, and purpose of Introduction to Data Structures.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO1.2",
-          "description": "Apply the concept of dynamic memory allocation in Python 3.12 to implement linked list operations such as insertion and deletion.",
+          "description": "Apply the principles of Introduction to Data Structures to solve a small, worked example in a lab setting.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO1.3",
-          "description": "Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of linked list operations.",
+          "description": "Collaborate with peers to review, critique, and improve an implementation of Introduction to Data Structures.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implement basic operations on arrays and linked lists",
+      "teaching_activities": "Face-to-face lecture on Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implementing basic operations",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
         "CLO1",
         "CLO2",
-        "CLO3"
+        "CLO4"
       ]
     },
     {
       "week_number": 2,
-      "topic": "Advanced Data Structures",
+      "topic": "Stacks and Queues",
       "lesson_outcomes": [
         {
           "llo_id": "LLO2.1",
-          "description": "Identify the difference between a stack and a queue in terms of their basic operations and use cases, and explain how they are implemented using std::vector in C++17.",
+          "description": "Identify the difference between stack and queue data structures in C++17 and describe their primary operations (push, pop for stack; enqueue, dequeue for queue).",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO2.2",
-          "description": "Apply a graph algorithm to find the shortest path in a weighted graph using std::priority_queue in C++17.",
+          "description": "Apply the concept of stacks and queues to solve a problem involving managing function calls in a C++17 program, such as using std::function and std::stack.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO2.3",
-          "description": "Collaborate with a team to integrate a stack and a queue into a larger project management system using C++17 and ensure that the operations are performed efficiently and without memory leaks.",
+          "description": "Collaborate in a hands-on lab using GDB to debug and test the implementation of stacks and queues in a C++17 project, ensuring the correct order of operations and edge cases are handled.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Stacks and Queues using C++17 + Hands-on Lab in C++17: Implement stack and queue operations",
+      "teaching_activities": "Face-to-face lecture on Stacks and Queues using C++17 + Hands-on Lab in GDB: Debugging and Testing",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -108,25 +108,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO3.1",
-          "description": "Identify the difference between a tree and a graph in a Jupyter Notebook using Python 3.12.",
+          "description": "Identify the difference between a binary tree and a binary search tree in PostgreSQL 16 and explain their properties.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO3.2",
-          "description": "Apply Dijkstra's algorithm to find the shortest path in a graph implemented in Python 3.12.",
+          "description": "Implement a breadth-first search (BFS) algorithm in Python 3.12 to traverse a tree structure in a Jupyter Notebook.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO3.3",
-          "description": "Collaborate with a peer to debug a segmentation fault in GDB during the implementation of a graph traversal algorithm in Python 3.12.",
+          "description": "Collaborate with a partner to debug and correct a DFS implementation in C++17 using GDB in a PostgreSQL 16 environment.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Trees and Graphs using Jupyter Notebook + Hands-on Lab in Python 3.12: Implement graph and tree algorithms",
-      "assessment": "Project Rubric",
-      "evidence": "Final Project + Rubric",
+      "teaching_activities": "Face-to-face lecture on Trees and Graphs using PostgreSQL 16 + Hands-on Lab in Jupyter Notebook: Implementing BFS and DFS",
+      "assessment": "Lab Rubric",
+      "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -136,25 +136,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO4.1",
-          "description": "Identify the time complexity of insertion sort and explain why it is generally considered inefficient for large datasets.",
+          "description": "Identify the time complexity of QuickSort and why it is considered efficient for certain data sizes.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO4.2",
-          "description": "Apply a graph algorithm to implement a priority queue in C++17 to optimize the performance of the selection sort algorithm.",
+          "description": "Apply the partitioning step of QuickSort algorithm in a hands-on CMake lab using Google Test.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO4.3",
-          "description": "Collaborate with a peer to debug and correct a common sorting bug in a C++17 program using a debugger like GDB.",
+          "description": "Collaborate in debugging a QuickSort implementation that exhibits stack overflow issues using GDB.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Sorting Algorithms using GCC + Hands-on Lab in C++17: Implement sorting algorithms",
+      "teaching_activities": "Face-to-face lecture on Sorting Algorithms using Google Test + Hands-on Lab in CMake: Implementing QuickSort",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO6",
+        "CLO5",
         "CLO1"
       ]
     },
@@ -164,25 +164,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO5.1",
-          "description": "Identify and define the difference between linear search and binary search algorithms in a C++17 context.",
+          "description": "Identify the time complexity of binary search and explain why it is O(log n) using C++17 and std::vector.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO5.2",
-          "description": "Implement the binary search algorithm in C++17 using std::vector and std::lower_bound.",
+          "description": "Apply the concept of binary search to solve a problem of finding an element in a sorted array using Python 3.12 and std::vector.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO5.3",
-          "description": "Collaborate in debugging a binary search implementation that exhibits a segmentation fault using GDB.",
+          "description": "Collaborate in a Git lab to integrate binary search implementation into a larger project, ensuring code quality and maintainability.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Searching Algorithms using Google Test + Hands-on Lab in C++17: Implement searching algorithms",
+      "teaching_activities": "Face-to-face lecture on Searching Algorithms using Catch2 + Hands-on Lab in Git: Implementing Binary Search",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO2",
+        "CLO6",
         "CLO1"
       ]
     },
@@ -192,25 +192,24 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO6.1",
-          "description": "Identify the base case and recursive case in the implementation of a factorial function in Python 3.12.",
+          "description": "Identify the base case and recursive case in a recursive function using C++17 and Debug with GDB in Valgrind.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO6.2",
-          "description": "Apply the concept of tail recursion optimization in the design of a recursive algorithm for calculating Fibonacci numbers in Python 3.12.",
+          "description": "Apply tail recursion optimization principles to improve the efficiency of a recursive function in Python 3.12 and test with pytest.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO6.3",
-          "description": "Collaborate with a partner to debug and optimize a recursive algorithm for finding the shortest path in a maze using CMake as the build system in Python 3.12.",
+          "description": "Collaborate in designing a recursive algorithm for a complex problem and implement it in C++17, debugging with GDB in Valgrind.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Recursion using CMake + Hands-on Lab in Python 3.12: Implement recursive algorithms",
-      "assessment": "Lab Rubric",
-      "evidence": "Lab Output",
+      "teaching_activities": "Face-to-face lecture on Recursion using GCC + Hands-on Lab in Valgrind: Debugging Recursive Functions",
+      "assessment": "Quiz",
+      "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
-        "CLO3",
         "CLO1"
       ]
     },
@@ -220,24 +219,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO7.1",
-          "description": "Identify the concept of overlapping subproblems in dynamic programming and explain why they are crucial for optimization.",
+          "description": "Identify the key characteristics of the Knapsack problem and explain how they differ from other combinatorial optimization problems.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO7.2",
-          "description": "Implement the Fibonacci sequence using dynamic programming in Python 3.12, applying memoization to optimize the algorithm.",
+          "description": "Apply the concept of memoization to design an efficient algorithm for solving the 0/1 Knapsack problem using Python 3.12.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO7.3",
-          "description": "Collaborate in designing a PostgreSQL 16 database schema to store and retrieve results of dynamic programming problems efficiently.",
+          "description": "Collaborate with a team to integrate the implemented Knapsack algorithm into a larger project using PyCharm and Git for version control.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Dynamic Programming using PostgreSQL 16 + Hands-on Lab in Python 3.12: Implement dynamic programming problems",
-      "assessment": "Quiz",
-      "evidence": "Quiz Answer Sheet",
+      "teaching_activities": "Face-to-face lecture on Dynamic Programming using Python 3.12 + Hands-on Lab in PyCharm: Implementing Knapsack Problem",
+      "assessment": "Recitation",
+      "evidence": "Recitation Log",
       "aligned_clo": [
+        "CLO4",
         "CLO1"
       ]
     },
@@ -247,21 +247,21 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO8.1",
-          "description": "Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort has a lower time complexity of O(n log n) compared to QuickSort's average time complexity of O(n log n).",
+          "description": "Identify the Big O notation for sorting algorithms and explain why it's important for algorithmic complexity.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO8.2",
-          "description": "Apply a graph algorithm in Python 3.12 to find the shortest path in a weighted graph, and use Git to version control the implementation and test cases.",
+          "description": "Apply the concept of time complexity in analyzing the performance of a recursive algorithm implemented in C++17.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO8.3",
-          "description": "Collaborate with peers to debug and optimize a Python 3.12 program that calculates the time complexity of various algorithms using a profiler tool like cProfile.",
+          "description": "Collaborate in a scenario where you analyze the algorithmic complexity of a database query optimization in PostgreSQL 16 using CMake.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Algorithmic Complexity using Git + Hands-on Lab in Python 3.12: Analyze algorithmic complexity",
+      "teaching_activities": "Face-to-face lecture on Algorithmic Complexity using C++17 + Hands-on Lab in GDB: Analyzing Algorithm Performance",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -275,27 +275,27 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO9.1",
-          "description": "Explain how the Python 3.12 garbage collector works and its impact on memory management.",
+          "description": "Identify the key topics covered in the Midterm Assessment and Review session using GDB for debugging Python 3.12 code.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO9.2",
-          "description": "Apply the principles of exception handling in Python 3.12 to design and implement a robust error-handling mechanism in a PyCharm project.",
+          "description": "Apply the principles of exception handling in Python 3.12 to solve a problem during the hands-on lab in PyCharm.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO9.3",
-          "description": "Collaborate with peers to debug and optimize a PyCharm project using Git for version control and pytest for testing.",
+          "description": "Collaborate with peers in a PyCharm environment to debug and optimize a mid-sized Python 3.12 project.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Midterm Review using PyCharm + Hands-on Lab in Python 3.12: Review midterm topics",
+      "teaching_activities": "Face-to-face lecture on Midterm Review using Python 3.12 + Hands-on Lab in PyCharm: Reviewing and Debugging",
       "assessment": "Midterm Exam",
       "evidence": "Midterm Exam Answer Sheet",
       "aligned_clo": [
         "CLO1",
         "CLO2",
-        "CLO3",
+        "CLO4",
         "CLO5",
         "CLO6"
       ]
@@ -306,25 +306,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO10.1",
-          "description": "Identify the differences between contiguous and non-contiguous memory allocation for arrays and linked lists in C++17.",
+          "description": "Identify the difference between breadth-first search (BFS) and depth-first search (DFS) traversal algorithms in a graph using GDB to debug a DFS implementation.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO10.2",
-          "description": "Apply the concept of dynamic memory allocation in C++17 to implement a function that dynamically allocates and deallocates memory for a linked list.",
+          "description": "Apply Dijkstra's algorithm to find the shortest path in a weighted graph using PyCharm to implement the algorithm in Python 3.12.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO10.3",
-          "description": "Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of a linked list operation in C++17.",
+          "description": "Collaborate with a peer to debug and optimize a breadth-first search implementation in C++17 using Visual Studio Code (VS Code) for code review.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Arrays and Linked Lists using C++17 + Hands-on Lab in C++17: Implement advanced array and linked list operations",
+      "teaching_activities": "Face-to-face lecture on Advanced Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implementing Doubly Linked Lists",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
-        "CLO2",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -334,25 +334,26 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO11.1",
-          "description": "Explain how a binary search tree maintains sorted order and how it handles insertion and deletion operations.",
+          "description": "Identify the difference between Dijkstra's algorithm and Bellman-Ford algorithm for solving the single-source shortest path problem in a graph.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO11.2",
-          "description": "Implement Kruskal's algorithm for finding a minimum spanning tree in Python 3.12 using the std::vector and std::unique_ptr containers.",
+          "description": "Apply Dijkstra's algorithm in a Jupyter Notebook using Python 3.12 and PostgreSQL 16 to find the shortest path in a weighted graph scenario.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO11.3",
-          "description": "Collaborate with a team to debug and optimize a graph traversal implementation in Python 3.12 using Jupyter Notebook and pytest for testing.",
+          "description": "Collaborate with a peer to debug a segmentation fault encountered during the implementation of Dijkstra's algorithm in C++17 using std::vector.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Trees and Graphs: Advanced using Jupyter Notebook + Hands-on Lab in Python 3.12: Implement advanced tree and graph algorithms",
-      "assessment": "Project Rubric",
-      "evidence": "Final Project + Rubric",
+      "teaching_activities": "Face-to-face lecture on Advanced Trees and Graphs using PostgreSQL 16 + Hands-on Lab in Jupyter Notebook: Implementing Dijkstra's Algorithm",
+      "assessment": "Recitation",
+      "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO3",
+        "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -362,24 +363,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO12.1",
-          "description": "Identify the time complexity of insertion sort and explain why it is O(n^2).",
+          "description": "Identify the difference between Prim's and Kruskal's algorithms for constructing a Minimum Spanning Tree.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO12.2",
-          "description": "Implement the cocktail shaker sort algorithm in C++17 using std::vector.",
+          "description": "Apply Kruskal's algorithm to solve a Minimum Spanning Tree problem using a weighted graph in C++17 with std::vector and std::set.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO12.3",
-          "description": "Collaborate in a group to debug and optimize the implementation of cocktail shaker sort in C++17.",
+          "description": "Collaborate with a peer to debug and optimize a Minimum Spanning Tree implementation in CMake using Google Test for testing.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Sorting Algorithms: Advanced using GCC + Hands-on Lab in C++17: Implement advanced sorting algorithms",
-      "assessment": "Recitation",
-      "evidence": "Recitation Log",
+      "teaching_activities": "Face-to-face lecture on Advanced Sorting Algorithms using Google Test + Hands-on Lab in CMake: Implementing MergeSort",
+      "assessment": "Quiz",
+      "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
+        "CLO6",
         "CLO5",
         "CLO1"
       ]
@@ -390,21 +392,21 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO13.1",
-          "description": "Explain how the A* search algorithm differs from a graph algorithm in terms of heuristic usage and its impact on search efficiency.",
+          "description": "Identify the role of hash functions in the construction of hash tables and explain their properties.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO13.2",
-          "description": "Implement the A* search algorithm in C++17 using std::vector and std::priority_queue for managing the open and closed lists.",
+          "description": "Apply the principles of chaining and open addressing to resolve collisions in hash tables.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO13.3",
-          "description": "Collaborate with a peer to debug and optimize the A* search implementation in C++17, ensuring it handles edge cases and large graphs efficiently.",
+          "description": "Demonstrate the use of Git for version control while implementing a hash table data structure in C++17.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Searching Algorithms: Advanced using Google Test + Hands-on Lab in C++17: Implement advanced searching algorithms",
+      "teaching_activities": "Face-to-face lecture on Advanced Searching Algorithms using Catch2 + Hands-on Lab in Git: Implementing Jump Search",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -418,25 +420,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO14.1",
-          "description": "Identify the differences between tail recursion and non-tail recursion, and explain why tail recursion is more efficient in terms of function calls and stack usage.",
+          "description": "Identify the properties of an AVL tree and how they ensure balance during insertions and deletions.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO14.2",
-          "description": "Implement a recursive algorithm to solve the Tower of Hanoi problem using Python 3.12 and CMake as the build system.",
+          "description": "Apply a graph algorithm in a scenario where AVL trees are used to manage a graph representing a network topology.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO14.3",
-          "description": "Collaborate with a peer to debug and optimize a recursive function that calculates the factorial of a number using Python 3.12 and CMake for testing and debugging.",
+          "description": "Collaborate with a peer to debug a recursive AVL tree insertion function using GDB in a C++17 environment.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Recursion: Advanced using CMake + Hands-on Lab in Python 3.12: Implement advanced recursive algorithms",
+      "teaching_activities": "Face-to-face lecture on Advanced Recursion using GCC + Hands-on Lab in Valgrind: Debugging Recursive Algorithms",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO2",
+        "CLO5",
         "CLO1"
       ]
     },
@@ -446,25 +448,26 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO15.1",
-          "description": "Explain how memoization optimizes recursive dynamic programming solutions and its impact on algorithm runtime in PostgreSQL 16.",
+          "description": "Identify the Greedy Algorithm strategy and explain why it is suitable for the Longest Common Subsequence problem.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO15.2",
-          "description": "Implement a longest common subsequence problem using dynamic programming in Python 3.12 with a focus on using the built-in `zip` function and list comprehensions.",
+          "description": "Apply the Greedy Algorithm to implement the Longest Common Subsequence in Python 3.12, using std::vector for dynamic programming.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO15.3",
-          "description": "Collaborate with peers to debug and optimize a dynamic programming algorithm in PostgreSQL 16, ensuring the solution is efficient and scalable.",
+          "description": "Collaborate with peers to debug and optimize the Greedy Algorithm implementation in PyCharm, leveraging pytest for testing.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Dynamic Programming: Advanced using PostgreSQL 16 + Hands-on Lab in Python 3.12: Implement advanced dynamic programming problems",
-      "assessment": "Project Rubric",
-      "evidence": "Final Project + Rubric",
+      "teaching_activities": "Face-to-face lecture on Advanced Dynamic Programming using Python 3.12 + Hands-on Lab in PyCharm: Implementing Longest Common Subsequence",
+      "assessment": "Recitation",
+      "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO3",
+        "CLO4",
+        "CLO5",
         "CLO1"
       ]
     },
@@ -474,24 +477,25 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO16.1",
-          "description": "Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort is considered O(n log n).",
+          "description": "Identify the role of backtracking in solving the Eight Queens problem and how it differs from the brute-force approach.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO16.2",
-          "description": "Apply a graph algorithm to find the shortest path in a weighted graph using Python 3.12 with a priority queue implemented with a heap.",
+          "description": "Apply the branch-and-bound algorithm to solve the Knapsack problem with a given set of items and weights.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO16.3",
-          "description": "Collaborate in a group to debug and optimize a Python 3.12 program that calculates the number of operations for a given algorithm, ensuring precision and efficiency.",
+          "description": "Collaborate in a hands-on lab using GDB to analyze the efficiency of your implemented backtracking and branch-and-bound algorithms.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Algorithmic Complexity: Advanced using Git + Hands-on Lab in Python 3.12: Analyze advanced algorithmic complexity",
-      "assessment": "Recitation",
-      "evidence": "Recitation Log",
+      "teaching_activities": "Face-to-face lecture on Advanced Algorithmic Complexity using C++17 + Hands-on Lab in GDB: Analyzing Algorithm Efficiency",
+      "assessment": "Quiz",
+      "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
+        "CLO4",
         "CLO5",
         "CLO1"
       ]
@@ -502,27 +506,27 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO17.1",
-          "description": "Identify the key components and requirements for a final project in Python 3.12, such as the use of pytest for automated testing.",
+          "description": "Identify the key components and requirements for a successful capstone project using Python 3.12 and PyCharm.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO17.2",
-          "description": "Apply best practices for project documentation and version control using Git, such as creating a README file and committing changes to a GitHub repository.",
+          "description": "Apply best practices for setting up a project environment in PyCharm, including version control with Git and dependency management with CMake.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO17.3",
-          "description": "Demonstrate persistence while debugging a final project issue in GDB, such as a segmentation fault, during the implementation of a complex algorithm in Python 3.12.",
+          "description": "Construct a detailed project plan that includes milestones, deliverables, and ethical considerations, using a project management tool like Jira.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Final Project Preparation using VS Code + Hands-on Lab in Python 3.12: Final project preparation",
+      "teaching_activities": "Face-to-face lecture on Final Project Preparation using Python 3.12 + Hands-on Lab in PyCharm: Setting up Project Environment",
       "assessment": "Project Rubric",
       "evidence": "Final Project + Rubric",
       "aligned_clo": [
-        "CLO6",
         "CLO2",
-        "CLO3"
+        "CLO6",
+        "CLO4"
       ]
     },
     {
@@ -531,27 +535,27 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO18.1",
-          "description": "Explain how to use GDB to debug a C++17 program and identify common issues.",
+          "description": "Identify the key components of a successful Final Project Defense presentation and explain their importance using Python 3.12.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO18.2",
-          "description": "Apply the principles of object-oriented design to integrate a PostgreSQL 16 database into a C++17 project.",
+          "description": "Apply best practices for code review in Python 3.12 during the Final Project Comprehensive Review session.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO18.3",
-          "description": "Collaborate with peers to prepare and present a comprehensive review of a final project in a professional manner.",
+          "description": "Collaborate with peers to provide constructive feedback on the Final Project using a Jupyter Notebook for documentation and analysis.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Final Project Defense and Comprehensive Review using GDB + Hands-on Lab in C++17: Final project defense and review",
+      "teaching_activities": "Face-to-face lecture on Final Project Defense using Python 3.12 + Hands-on Lab in PyCharm: Reviewing Final Project",
       "assessment": "Final Project Defense",
       "evidence": "Final Project Defense Rubric",
       "aligned_clo": [
         "CLO1",
         "CLO2",
-        "CLO3",
+        "CLO4",
         "CLO5",
         "CLO6"
       ]
