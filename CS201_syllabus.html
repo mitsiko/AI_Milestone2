@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CS201 &mdash; Data Structures and Algorithms | Course Syllabus</title>
+<style>
+  @page { size: A4; margin: 20mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.5;
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 28px;
+    background: #fff;
+  }
+  h1, h2, h3, h4 {
+    font-family: Georgia, "Times New Roman", serif;
+    color: #7f1416;
+    margin: 0 0 8px;
+  }
+  h1 { font-size: 26px; text-align: center; letter-spacing: 0.4px; }
+  h2 {
+    font-size: 18px;
+    border-bottom: 2px solid #7f1416;
+    padding-bottom: 4px;
+    margin-top: 34px;
+  }
+  h3 { font-size: 15px; margin-top: 22px; }
+  h4 { font-size: 13px; margin-top: 16px; color: #333; }
+  header.doc-header {
+    text-align: center;
+    border-bottom: 3px double #7f1416;
+    padding-bottom: 18px;
+    margin-bottom: 26px;
+  }
+  header.doc-header .institution {
+    font-size: 12px; color: #555; letter-spacing: 1.2px;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  header.doc-header .university {
+    font-size: 14px; color: #333; letter-spacing: 0.6px;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  header.doc-header .college {
+    font-size: 15px; color: #7f1416; font-weight: bold; margin-bottom: 14px;
+  }
+  header.doc-header .subtitle { font-size: 13px; color: #333; margin-top: 6px; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+  th, td {
+    border: 1px solid #b8b8b8;
+    padding: 7px 9px;
+    vertical-align: top;
+    text-align: left;
+  }
+  th {
+    background: #f7eeee;
+    color: #7f1416;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  tr.exam-week td { background: #fdf6e3; font-weight: 600; }
+  tr:nth-child(even):not(.exam-week) td { background: #fafafa; }
+
+  table.matrix td, table.matrix th { text-align: center; padding: 6px 8px; }
+  table.matrix td:first-child, table.matrix th:first-child { text-align: left; }
+  table.matrix .section-header td {
+    background: #f0e4e4; font-weight: 700; color: #7f1416;
+    text-align: left; font-size: 12px;
+  }
+  .check { color: #7f1416; font-weight: 700; }
+
+  table.info-table td:first-child {
+    background: #f7eeee;
+    width: 24%;
+    font-weight: 600;
+    color: #7f1416;
+  }
+
+  .llos .k, .llos .s, .llos .a { display: block; margin: 3px 0; }
+  .llos .k::before { content: "K: "; font-weight: 700; color: #7f1416; }
+  .llos .s::before { content: "S: "; font-weight: 700; color: #7f1416; }
+  .llos .a::before { content: "A: "; font-weight: 700; color: #7f1416; }
+
+  .grading-block {
+    background: #f7eeee;
+    border-left: 4px solid #7f1416;
+    padding: 12px 16px;
+    margin: 10px 0 16px;
+    font-size: 13px;
+  }
+  .grading-formula {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12.5px;
+    display: block;
+    margin: 6px 0;
+  }
+  .grading-note { font-size: 12px; color: #555; margin-top: 8px; }
+
+  .pvm-block { margin: 10px 0 14px; }
+  .pvm-block h3 { margin-bottom: 4px; }
+  .pvm-block p { margin: 4px 0 8px; font-size: 13px; text-align: justify; }
+
+  .keywords {
+    font-size: 12px; color: #555; background: #f5f5f5;
+    padding: 8px 12px; border-left: 3px solid #7f1416;
+    margin: 8px 0 16px;
+  }
+
+  ol.values-list, ul.values-list {
+    margin: 6px 0 14px 22px; padding: 0; font-size: 13px;
+  }
+  ol.values-list li, ul.values-list li { margin: 3px 0; }
+
+  footer.doc-footer {
+    margin-top: 44px;
+    padding-top: 12px;
+    border-top: 1px solid #ccc;
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+  }
+
+  /* --- Export to PDF floating button (Milestone 2) ------------------- */
+  .export-pdf-button {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #7f1416;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease,
+                box-shadow 0.15s ease;
+  }
+  .export-pdf-button:hover {
+    background: #5e0f10;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  }
+  .export-pdf-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+  .export-pdf-button:focus-visible {
+    outline: 2px solid #7f1416;
+    outline-offset: 2px;
+  }
+  .export-pdf-button .icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  @media print {
+    body { margin: 0; max-width: none; padding: 0; }
+    h2 { page-break-after: avoid; }
+    tr { page-break-inside: avoid; }
+    table { page-break-inside: auto; }
+    .export-pdf-button { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<button
+  type="button"
+  class="export-pdf-button"
+  onclick="window.print();"
+  title="Print / Save as PDF"
+  aria-label="Export syllabus to PDF"
+>
+  <span class="icon" aria-hidden="true">&#x1F5A8;</span>
+  <span>Export to PDF</span>
+</button>
+<header class="doc-header">
+  <div class="institution">University of Perpetual Help System DALTA</div>
+  <div class="university">College of Computer Studies</div>
+  <div class="college">Course Syllabus</div>
+  <h1>CS201 &mdash; Data Structures and Algorithms</h1>
+  <div class="subtitle">First Semester, School Year 2025&ndash;2026</div>
+</header>
+
+<h2>Course Information</h2>
+<table class="info-table">
+  <tr><td>Course Code</td><td>CS201</td></tr>
+  <tr><td>Course Title</td><td>Data Structures and Algorithms</td></tr>
+  <tr><td>Course Description</td><td>An in-depth study of fundamental data structures including arrays, linked lists, stacks, queues, trees, and graphs, as well as advanced algorithms such as sorting, searching, recursion, dynamic programming, and analysis of algorithmic complexity.</td></tr>
+  <tr>
+    <td>Prerequisite(s)</td>
+    <td>
+        CS101
+    </td>
+  </tr>
+  <tr><td>Credit Units</td><td>3 Units</td></tr>
+</table>
+
+<h2>Institutional PVM</h2>
+
+<div class="pvm-block">
+  <h3>Philosophy</h3>
+  <p>The University of Perpetual Help System DALTA believes and invokes Divine Guidance in the betterment of the quality of life through national development and transformation, which are predicated upon the quality of education of its people. Towards this end, the Institution is committed to the ideals of teaching, community service and research as it nurtures the value of "Helpers of God", with "Character Building is Nation Building" as its guiding principle.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Vision</h3>
+  <p>The University of Perpetual Help System DALTA shall emerge as a premier university in the Philippines. It shall provide a venue for the pursuit of excellence in academics, technology and research through local and international linkages.</p>
+  <p>The University shall take the role of a catalyst for human development. It shall inculcate Christian values and Catholic doctrine, as a way of strengthening the moral fiber of the Filipino, a people who are "Helpers of God", proud of their race and prepared for the exemplary global participation in the sciences, arts, humanities, sports and business.</p>
+  <p>It foresees the Filipino people enjoying a quality of life in abundance, living in peace and building a nation that the next generation will nourish, cherish and value.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Mission</h3>
+  <p>The University of Perpetual Help System DALTA is dedicated to the development of the Filipino as a LEADER. It aims to graduate DYNAMIC STUDENTS who are physically, intellectually, socially and spiritually committed to the achievement of the highest quality of life.</p>
+  <p>As a system of service in health and in education, it is dedicated to the FORMATION OF CHRIST-CENTERED, SERVICE ORIENTED, AND RESEARCH-DRIVEN INDIVIDUALS WITH GREAT SOCIAL CONCERN and COMMITMENT TO THE DELIVERY OF QUALITY EDUCATION AND HEALTH CARE.</p>
+  <p>It shall produce Perpetualities as "HELPERS OF GOD", a vital ingredient to nation building.</p>
+</div>
+
+<div class="keywords">
+  <strong>Mission Keywords:</strong>
+  A &mdash; LEADER; B &mdash; DYNAMIC STUDENTS;
+  C &mdash; FORMATION OF CHRIST-CENTERED, SERVICE ORIENTED, AND RESEARCH-DRIVEN INDIVIDUALS;
+  D &mdash; WITH GREAT SOCIAL CONCERN;
+  E &mdash; COMMITMENT TO THE DELIVERY OF QUALITY EDUCATION AND HEALTH CARE;
+  F &mdash; HELPERS OF GOD
+</div>
+
+<h3>Core Values</h3>
+<ol class="values-list">
+  <li>Love of God, Love of Self, Family, and Neighbor</li>
+  <li>Love of Country and Good Governance</li>
+  <li>Academic and Professional Excellence</li>
+  <li>Health and Ecological Consciousness</li>
+  <li>Peace and Global Solidarity</li>
+  <li>Filipino Christian Leadership</li>
+  <li>Value of Catholic Doctrine</li>
+  <li>UPHSD and the Perpetualite</li>
+</ol>
+
+<h3>College of Computer Studies &mdash; Pillars of Excellence</h3>
+<ol class="values-list">
+  <li>Excellence in Teaching and Learning</li>
+  <li>Excellence in Community Extension Service</li>
+  <li>Excellence in Research and Innovation</li>
+</ol>
+
+<h2>College of Computer Studies PVM</h2>
+
+<div class="pvm-block">
+  <h3>Philosophy</h3>
+  <p>The College of Computer Studies is committed to the realization of the university's objective of providing a venue for the pursuit of excellence particularly the areas of information technology education.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Vision</h3>
+  <p>The UPHSD College of Computer Studies envisions a cadre of graduates who shall successfully meet the challenges of a technology driven global society. Hence the college shall endeavor to become the leading Information Technology School in the CALABARZON Area offering quality instruction in IT and CS.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Mission</h3>
+  <p>The College cultivates a culture of excellence by delivering quality programs in IT and CS to produce competent graduates who shall meet the needs of the IT industry locally and internationally.</p>
+</div>
+
+<h3>College Objectives</h3>
+<ol class="values-list">
+  <li>To act in accordance with the specified standards of the Commission on Higher Education (CHED) in connection with the BSCS and BSIT programs.</li>
+  <li>To be knowledgeable in the concept and theories, algorithmic foundations, implementation, and application of information and computing solutions.</li>
+  <li>To demonstrate effectiveness as team members or as team leaders in their jobs and careers.</li>
+  <li>To be committed to high standards of professionalism.</li>
+  <li>To be linked with the ICT industries and the Students Apprenticeship Program of the BSCS and BSIT programs.</li>
+</ol>
+
+<h2>Graduate Attributes &times; Mission Keywords</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:52%;">Graduate Attributes</th>
+      <th colspan="6">Mission Key Words</th>
+    </tr>
+    <tr>
+      <th style="width:8%;">A</th>
+      <th style="width:8%;">B</th>
+      <th style="width:8%;">C</th>
+      <th style="width:8%;">D</th>
+      <th style="width:8%;">E</th>
+      <th style="width:8%;">F</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="section-header"><td colspan="7">CHARACTER</td></tr>
+    <tr><td>1. Graduates demonstrate a deep faith in God, embodying professional, humanistic, and altruistic values in their personal and professional lives.</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>2. Graduates serve as Helpers of God, dedicating their knowledge and skills to the betterment of others.</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td class="check">&check;</td></tr>
+    <tr><td>3. Graduates exemplify servant leadership, guiding others with integrity, humility, and a commitment to the common good.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td><td class="check">&check;</td></tr>
+    <tr><td>4. Graduates uphold ethical responsibility in both physical and digital environments, practicing responsible citizenship and promoting positive engagement and interactions.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+
+    <tr class="section-header"><td colspan="7">COMPETENCE</td></tr>
+    <tr><td>5. Graduates communicate effectively across diverse contexts, demonstrating clarity, coherence, and cultural sensitivity.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>6. Graduates apply critical and creative thinking to solve complex problems and innovate in their respective fields.</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>7. Graduates exhibit competence and excellence in their professional practice, continuously striving for high standards of performance.</td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+    <tr><td>8. Graduates embrace lifelong learning, engage in reflective practice, and contribute to research and innovation for societal advancement.</td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td></tr>
+
+    <tr class="section-header"><td colspan="7">COMMITMENT TO SERVICE</td></tr>
+    <tr><td>9. Graduates actively contribute to nation-building by engaging in meaningful service and leadership roles in their communities.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>10. Graduates advocate for environmental sustainability, integrating ecological consciousness into their decisions and actions.</td><td></td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>11. Graduates collaborate effectively in diverse teams, demonstrating commitment, adaptability and teamwork in achieving shared goals.</td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Program Educational Objectives (PEOs) &times; Graduate Attributes</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="3" style="width:44%;">Program Educational Objectives<br><small>After five years of graduation, the graduates can:</small></th>
+      <th colspan="11">Graduate Attributes</th>
+    </tr>
+    <tr>
+      <th colspan="4">Character</th>
+      <th colspan="4">Competence</th>
+      <th colspan="3">Commitment to Service</th>
+    </tr>
+    <tr>
+      <th>GA1</th><th>GA2</th><th>GA3</th><th>GA4</th>
+      <th>GA5</th><th>GA6</th><th>GA7</th><th>GA8</th>
+      <th>GA9</th><th>GA10</th><th>GA11</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. Technical Mastery and Innovation. Graduates will demonstrate strong technical competence and creative problem-solving skills in designing, implementing, and managing IT systems that address real-world challenges in organizations and communities.</td>
+      <td></td><td></td><td></td><td></td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td></td><td></td><td></td>
+    </tr>
+    <tr>
+      <td>2. Professionalism, Leadership, and Ethics. Graduates will exemplify ethical leadership, professionalism, and collaborative engagement in multidisciplinary IT projects, ensuring adherence to legal, social, and organizational standards.</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td></td><td></td><td></td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+    <tr>
+      <td>3. Lifelong Learning and Global Adaptability. Graduates will pursue lifelong learning and continuous skill enhancement to remain responsive to evolving technologies, industry demands, and global IT trends.</td>
+      <td></td><td></td><td></td><td></td>
+      <td></td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+    <tr>
+      <td>4. Societal Contribution and Sustainable Development. Graduates will contribute to inclusive and sustainable digital transformation by developing IT solutions that address societal, environmental, and organizational needs across diverse sectors.</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Program Learning Outcomes (PLOs) &times; Program Educational Objectives (PEOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:70%;">Program Learning Outcomes (PLOs)</th>
+      <th colspan="4">Program Educational Objectives (PEOs)</th>
+    </tr>
+    <tr>
+      <th>1</th><th>2</th><th>3</th><th>4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1. Computing Knowledge and Problem Solving. Apply knowledge of computing, science, and mathematics to analyze, design, and solve complex IT problems in various domains.</td><td class="check">&check;</td><td></td><td></td><td></td></tr>
+    <tr><td>2. IT Systems Design and Integration. Design, implement, and optimize IT-based solutions that meet user requirements, industry standards, and sustainability goals.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+    <tr><td>3. Innovative and Interactive IT Applications. Develop creative, immersive, and user-centered digital systems using advanced tools, emerging technologies, and programming environments.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>4. Communication and Collaboration. Communicate effectively in oral, written, and digital forms and work productively in diverse teams to deliver quality IT solutions.</td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+    <tr><td>5. Ethics, Legal, and Social Responsibility. Uphold ethical, legal, and professional standards in IT practice, ensuring data privacy, security, and inclusivity while addressing organizational and societal challenges.</td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+    <tr><td>6. Lifelong Learning and Professional Development. Engage in lifelong learning to stay current with advancements in information technology and to support professional growth.</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Course Learning Outcomes (CLOs) &times; Program Learning Outcomes (PLOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:70%;">Course Learning Outcomes (CLOs)<br><small>At the end of the course, the students can:</small></th>
+      <th colspan="6">Program Learning Outcomes (PLOs)</th>
+    </tr>
+    <tr>
+      <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. (K) Identify the basic operations of arrays and their applications in problem-solving.</td>
+        <td>
+<span class="check">&check;</span>        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+      <td>2. (K) Define the key components of linked lists and their use in data manipulation.</td>
+        <td>
+        </td>
+        <td>
+<span class="check">&check;</span>        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+      <td>3. (S) Implement and test the core data structures covered in this course using a modern systems programming language.</td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+<span class="check">&check;</span>        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+      <td>4. (S) Apply sorting algorithms to solve data organization problems.</td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+<span class="check">&check;</span>        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+      <td>5. (A) Collaborate in a team to design, test, and document a software artifact for the course capstone.</td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+<span class="check">&check;</span>        </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Lesson Learning Outcomes (LLOs) &times; Course Learning Outcomes (CLOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:60%;">Lesson Learning Outcomes (LLOs)<br><small>At the end of the lesson, the students can:</small></th>
+      <th colspan="5">Course Learning Outcomes (CLOs)</th>
+    </tr>
+    <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 1 &mdash; Introduction to Data Structures
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the basic characteristics of arrays and linked lists in Python 3.12 and describe their fundamental differences.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply the concept of dynamic memory allocation in Python 3.12 to implement linked list operations such as insertion and deletion.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of linked list operations.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 2 &mdash; Advanced Data Structures
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the difference between a stack and a queue in terms of their basic operations and use cases, and explain how they are implemented using std::vector in C++17.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply a graph algorithm to find the shortest path in a weighted graph using std::priority_queue in C++17.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a team to integrate a stack and a queue into a larger project management system using C++17 and ensure that the operations are performed efficiently and without memory leaks.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 3 &mdash; Trees and Graphs
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the difference between a tree and a graph in a Jupyter Notebook using Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply Dijkstra&#39;s algorithm to find the shortest path in a graph implemented in Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a peer to debug a segmentation fault in GDB during the implementation of a graph traversal algorithm in Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 4 &mdash; Sorting Algorithms
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the time complexity of insertion sort and explain why it is generally considered inefficient for large datasets.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Apply a graph algorithm to implement a priority queue in C++17 to optimize the performance of the selection sort algorithm.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a peer to debug and correct a common sorting bug in a C++17 program using a debugger like GDB.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 5 &mdash; Searching Algorithms
+        </td>
+      </tr>
+        <tr>
+          <td>Identify and define the difference between linear search and binary search algorithms in a C++17 context.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement the binary search algorithm in C++17 using std::vector and std::lower_bound.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate in debugging a binary search implementation that exhibits a segmentation fault using GDB.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 6 &mdash; Recursion
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the base case and recursive case in the implementation of a factorial function in Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply the concept of tail recursion optimization in the design of a recursive algorithm for calculating Fibonacci numbers in Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a partner to debug and optimize a recursive algorithm for finding the shortest path in a maze using CMake as the build system in Python 3.12.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 7 &mdash; Dynamic Programming
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the concept of overlapping subproblems in dynamic programming and explain why they are crucial for optimization.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement the Fibonacci sequence using dynamic programming in Python 3.12, applying memoization to optimize the algorithm.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate in designing a PostgreSQL 16 database schema to store and retrieve results of dynamic programming problems efficiently.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 8 &mdash; Algorithmic Complexity
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort has a lower time complexity of O(n log n) compared to QuickSort&#39;s average time complexity of O(n log n).</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply a graph algorithm in Python 3.12 to find the shortest path in a weighted graph, and use Git to version control the implementation and test cases.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with peers to debug and optimize a Python 3.12 program that calculates the time complexity of various algorithms using a profiler tool like cProfile.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 9 &mdash; Midterm Assessment and Review
+        </td>
+      </tr>
+        <tr>
+          <td>Explain how the Python 3.12 garbage collector works and its impact on memory management.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Apply the principles of exception handling in Python 3.12 to design and implement a robust error-handling mechanism in a PyCharm project.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with peers to debug and optimize a PyCharm project using Git for version control and pytest for testing.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 10 &mdash; Graph Traversal Algorithms
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the differences between contiguous and non-contiguous memory allocation for arrays and linked lists in C++17.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply the concept of dynamic memory allocation in C++17 to implement a function that dynamically allocates and deallocates memory for a linked list.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of a linked list operation in C++17.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 11 &mdash; Shortest Path Algorithms
+        </td>
+      </tr>
+        <tr>
+          <td>Explain how a binary search tree maintains sorted order and how it handles insertion and deletion operations.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement Kruskal&#39;s algorithm for finding a minimum spanning tree in Python 3.12 using the std::vector and std::unique_ptr containers.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a team to debug and optimize a graph traversal implementation in Python 3.12 using Jupyter Notebook and pytest for testing.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 12 &mdash; Minimum Spanning Trees
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the time complexity of insertion sort and explain why it is O(n^2).</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement the cocktail shaker sort algorithm in C++17 using std::vector.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate in a group to debug and optimize the implementation of cocktail shaker sort in C++17.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 13 &mdash; Hash Tables and Hashing
+        </td>
+      </tr>
+        <tr>
+          <td>Explain how the A* search algorithm differs from a graph algorithm in terms of heuristic usage and its impact on search efficiency.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Implement the A* search algorithm in C++17 using std::vector and std::priority_queue for managing the open and closed lists.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a peer to debug and optimize the A* search implementation in C++17, ensuring it handles edge cases and large graphs efficiently.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 14 &mdash; Balanced Trees (AVL, Red-Black)
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the differences between tail recursion and non-tail recursion, and explain why tail recursion is more efficient in terms of function calls and stack usage.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement a recursive algorithm to solve the Tower of Hanoi problem using Python 3.12 and CMake as the build system.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with a peer to debug and optimize a recursive function that calculates the factorial of a number using Python 3.12 and CMake for testing and debugging.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 15 &mdash; Greedy Algorithms
+        </td>
+      </tr>
+        <tr>
+          <td>Explain how memoization optimizes recursive dynamic programming solutions and its impact on algorithm runtime in PostgreSQL 16.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Implement a longest common subsequence problem using dynamic programming in Python 3.12 with a focus on using the built-in `zip` function and list comprehensions.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with peers to debug and optimize a dynamic programming algorithm in PostgreSQL 16, ensuring the solution is efficient and scalable.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 16 &mdash; Backtracking and Branch-and-Bound
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort is considered O(n log n).</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Apply a graph algorithm to find the shortest path in a weighted graph using Python 3.12 with a priority queue implemented with a heap.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+          <td>Collaborate in a group to debug and optimize a Python 3.12 program that calculates the number of operations for a given algorithm, ensuring precision and efficiency.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 17 &mdash; Capstone Project Preparation
+        </td>
+      </tr>
+        <tr>
+          <td>Identify the key components and requirements for a final project in Python 3.12, such as the use of pytest for automated testing.</td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Apply best practices for project documentation and version control using Git, such as creating a README file and committing changes to a GitHub repository.</td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Demonstrate persistence while debugging a final project issue in GDB, such as a segmentation fault, during the implementation of a complex algorithm in Python 3.12.</td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+      <tr class="section-header">
+        <td colspan="6">
+          WEEK 18 &mdash; Final Project Defense and Comprehensive Review
+        </td>
+      </tr>
+        <tr>
+          <td>Explain how to use GDB to debug a C++17 program and identify common issues.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Apply the principles of object-oriented design to integrate a PostgreSQL 16 database into a C++17 project.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+        <tr>
+          <td>Collaborate with peers to prepare and present a comprehensive review of a final project in a professional manner.</td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+            <td>
+<span class="check">&check;</span>            </td>
+        </tr>
+  </tbody>
+</table>
+
+<h2>Course Syllabus &mdash; Weekly Schedule</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width:6%;">Week</th>
+      <th style="width:14%;">Topic</th>
+      <th style="width:26%;">Lesson Learning Outcomes (K / S / A)</th>
+      <th style="width:16%;">Teaching Learning Activity (TLA)</th>
+      <th style="width:12%;">Assessment Tool</th>
+      <th style="width:12%;">Result / Evidence</th>
+      <th style="width:14%;">Aligned CLO</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="">
+      <td>Week 1</td>
+      <td>Introduction to Data Structures</td>
+      <td class="llos">
+<span class="k">Identify the basic characteristics of arrays and linked lists in Python 3.12 and describe their fundamental differences.</span><span class="s">Apply the concept of dynamic memory allocation in Python 3.12 to implement linked list operations such as insertion and deletion.</span><span class="a">Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of linked list operations.</span>      </td>
+      <td>Face-to-face lecture on Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implement basic operations on arrays and linked lists</td>
+      <td>Lab Rubric</td>
+      <td>Lab Output</td>
+      <td>CLO1, CLO2, CLO3</td>
+    </tr>
+    <tr class="">
+      <td>Week 2</td>
+      <td>Advanced Data Structures</td>
+      <td class="llos">
+<span class="k">Identify the difference between a stack and a queue in terms of their basic operations and use cases, and explain how they are implemented using std::vector in C++17.</span><span class="s">Apply a graph algorithm to find the shortest path in a weighted graph using std::priority_queue in C++17.</span><span class="a">Collaborate with a team to integrate a stack and a queue into a larger project management system using C++17 and ensure that the operations are performed efficiently and without memory leaks.</span>      </td>
+      <td>Face-to-face lecture on Stacks and Queues using C++17 + Hands-on Lab in C++17: Implement stack and queue operations</td>
+      <td>Lab Rubric</td>
+      <td>Lab Output</td>
+      <td>CLO1</td>
+    </tr>
+    <tr class="">
+      <td>Week 3</td>
+      <td>Trees and Graphs</td>
+      <td class="llos">
+<span class="k">Identify the difference between a tree and a graph in a Jupyter Notebook using Python 3.12.</span><span class="s">Apply Dijkstra&#39;s algorithm to find the shortest path in a graph implemented in Python 3.12.</span><span class="a">Collaborate with a peer to debug a segmentation fault in GDB during the implementation of a graph traversal algorithm in Python 3.12.</span>      </td>
+      <td>Face-to-face lecture on Trees and Graphs using Jupyter Notebook + Hands-on Lab in Python 3.12: Implement graph and tree algorithms</td>
+      <td>Project Rubric</td>
+      <td>Final Project + Rubric</td>
+      <td>CLO1, CLO5</td>
+    </tr>
+    <tr class="">
+      <td>Week 4</td>
+      <td>Sorting Algorithms</td>
+      <td class="llos">
+<span class="k">Identify the time complexity of insertion sort and explain why it is generally considered inefficient for large datasets.</span><span class="s">Apply a graph algorithm to implement a priority queue in C++17 to optimize the performance of the selection sort algorithm.</span><span class="a">Collaborate with a peer to debug and correct a common sorting bug in a C++17 program using a debugger like GDB.</span>      </td>
+      <td>Face-to-face lecture on Sorting Algorithms using GCC + Hands-on Lab in C++17: Implement sorting algorithms</td>
+      <td>Lab Rubric</td>
+      <td>Lab Output</td>
+      <td>CLO1, CLO6</td>
+    </tr>
+    <tr class="">
+      <td>Week 5</td>
+      <td>Searching Algorithms</td>
+      <td class="llos">
+<span class="k">Identify and define the difference between linear search and binary search algorithms in a C++17 context.</span><span class="s">Implement the binary search algorithm in C++17 using std::vector and std::lower_bound.</span><span class="a">Collaborate in debugging a binary search implementation that exhibits a segmentation fault using GDB.</span>      </td>
+      <td>Face-to-face lecture on Searching Algorithms using Google Test + Hands-on Lab in C++17: Implement searching algorithms</td>
+      <td>Lab Rubric</td>
+      <td>Lab Output</td>
+      <td>CLO1, CLO2</td>
+    </tr>
+    <tr class="">
+      <td>Week 6</td>
+      <td>Recursion</td>
+      <td class="llos">
+<span class="k">Identify the base case and recursive case in the implementation of a factorial function in Python 3.12.</span><span class="s">Apply the concept of tail recursion optimization in the design of a recursive algorithm for calculating Fibonacci numbers in Python 3.12.</span><span class="a">Collaborate with a partner to debug and optimize a recursive algorithm for finding the shortest path in a maze using CMake as the build system in Python 3.12.</span>      </td>
+      <td>Face-to-face lecture on Recursion using CMake + Hands-on Lab in Python 3.12: Implement recursive algorithms</td>
+      <td>Lab Rubric</td>
+      <td>Lab Output</td>
+      <td>CLO1, CLO3</td>
+    </tr>
+    <tr class="">
+      <td>Week 7</td>
+      <td>Dynamic Programming</td>
+      <td class="llos">
+<span class="k">Identify the concept of overlapping subproblems in dynamic programming and explain why they are crucial for optimization.</span><span class="s">Implement the Fibonacci sequence using dynamic programming in Python 3.12, applying memoization to optimize the algorithm.</span><span class="a">Collaborate in designing a PostgreSQL 16 database schema to store and retrieve results of dynamic programming problems efficiently.</span>      </td>
+      <td>Face-to-face lecture on Dynamic Programming using PostgreSQL 16 + Hands-on Lab in Python 3.12: Implement dynamic programming problems</td>
+      <td>Quiz</td>
+      <td>Quiz Answer Sheet</td>
+      <td>CLO1</td>
+    </tr>
+    <tr class="">
+      <td>Week 8</td>
+      <td>Algorithmic Complexity</td>
+      <td class="llos">
+<span class="k">Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort has a lower time complexity of O(n log n) compared to QuickSort&#39;s average time complexity of O(n log n).</span><span class="s">Apply a graph algorithm in Python 3.12 to find the shortest path in a weighted graph, and use Git to version control the implementation and test cases.</span><span class="a">Collaborate with peers to debug and optimize a Python 3.12 program that calculates the time complexity of various algorithms using a profiler tool like cProfile.</span>      </td>
+      <td>Face-to-face lecture on Algorithmic Complexity using Git + Hands-on Lab in Python 3.12: Analyze algorithmic complexity</td>
+      <td>Recitation</td>
+      <td>Recitation Log</td>
+      <td>CLO1, CLO5</td>
+    </tr>
+    <tr class="exam-week">
+      <td>Week 9</td>
+      <td>Midterm Assessment and Review</td>
+      <td class="llos">
+<span class="k">Explain how the Python 3.12 garbage collector works and its impact on memory management.</span><span class="s">Apply the principles of exception handling in Python 3.12 to design and implement a robust error-handling mechanism in a PyCharm project.</span><span class="a">Collaborate with peers to debug and optimize a PyCharm project using Git for version control and pytest for testing.</span>      </td>
+      <td>Face-to-face lecture on Midterm Review using PyCharm + Hands-on Lab in Python 3.12: Review midterm topics</td>
+      <td>Midterm Exam</td>
+      <td>Midterm Exam Answer Sheet</td>
+      <td>CLO1, CLO2, CLO3, CLO5, CLO6</td>
+    </tr>
+    <tr class="">
+      <td>Week 10</td>
+      <td>Graph Traversal Algorithms</td>
+      <td class="llos">
+<span class="k">Identify the differences between contiguous and non-contiguous memory allocation for arrays and linked lists in C++17.</span><span class="s">Apply the concept of dynamic memory allocation in C++17 to implement a function that dynamically allocates and deallocates memory for a linked list.</span><span class="a">Demonstrate persistence while debugging a segmentation fault in GDB during the implementation of a linked list operation in C++17.</span>      </td>
+      <td>Face-to-face lecture on Advanced Arrays and Linked Lists using C++17 + Hands-on Lab in C++17: Implement advanced array and linked list operations</td>
+      <td>Quiz</td>
+      <td>Quiz Answer Sheet</td>
+      <td>CLO1, CLO2</td>
+    </tr>
+    <tr class="">
+      <td>Week 11</td>
+      <td>Shortest Path Algorithms</td>
+      <td class="llos">
+<span class="k">Explain how a binary search tree maintains sorted order and how it handles insertion and deletion operations.</span><span class="s">Implement Kruskal&#39;s algorithm for finding a minimum spanning tree in Python 3.12 using the std::vector and std::unique_ptr containers.</span><span class="a">Collaborate with a team to debug and optimize a graph traversal implementation in Python 3.12 using Jupyter Notebook and pytest for testing.</span>      </td>
+      <td>Face-to-face lecture on Trees and Graphs: Advanced using Jupyter Notebook + Hands-on Lab in Python 3.12: Implement advanced tree and graph algorithms</td>
+      <td>Project Rubric</td>
+      <td>Final Project + Rubric</td>
+      <td>CLO1, CLO3</td>
+    </tr>
+    <tr class="">
+      <td>Week 12</td>
+      <td>Minimum Spanning Trees</td>
+      <td class="llos">
+<span class="k">Identify the time complexity of insertion sort and explain why it is O(n^2).</span><span class="s">Implement the cocktail shaker sort algorithm in C++17 using std::vector.</span><span class="a">Collaborate in a group to debug and optimize the implementation of cocktail shaker sort in C++17.</span>      </td>
+      <td>Face-to-face lecture on Sorting Algorithms: Advanced using GCC + Hands-on Lab in C++17: Implement advanced sorting algorithms</td>
+      <td>Recitation</td>
+      <td>Recitation Log</td>
+      <td>CLO1, CLO5</td>
+    </tr>
+    <tr class="">
+      <td>Week 13</td>
+      <td>Hash Tables and Hashing</td>
+      <td class="llos">
+<span class="k">Explain how the A* search algorithm differs from a graph algorithm in terms of heuristic usage and its impact on search efficiency.</span><span class="s">Implement the A* search algorithm in C++17 using std::vector and std::priority_queue for managing the open and closed lists.</span><span class="a">Collaborate with a peer to debug and optimize the A* search implementation in C++17, ensuring it handles edge cases and large graphs efficiently.</span>      </td>
+      <td>Face-to-face lecture on Searching Algorithms: Advanced using Google Test + Hands-on Lab in C++17: Implement advanced searching algorithms</td>
+      <td>Quiz</td>
+      <td>Quiz Answer Sheet</td>
+      <td>CLO1, CLO6</td>
+    </tr>
+    <tr class="">
+      <td>Week 14</td>
+      <td>Balanced Trees (AVL, Red-Black)</td>
+      <td class="llos">
+<span class="k">Identify the differences between tail recursion and non-tail recursion, and explain why tail recursion is more efficient in terms of function calls and stack usage.</span><span class="s">Implement a recursive algorithm to solve the Tower of Hanoi problem using Python 3.12 and CMake as the build system.</span><span class="a">Collaborate with a peer to debug and optimize a recursive function that calculates the factorial of a number using Python 3.12 and CMake for testing and debugging.</span>      </td>
+      <td>Face-to-face lecture on Recursion: Advanced using CMake + Hands-on Lab in Python 3.12: Implement advanced recursive algorithms</td>
+      <td>Recitation</td>
+      <td>Recitation Log</td>
+      <td>CLO1, CLO2</td>
+    </tr>
+    <tr class="">
+      <td>Week 15</td>
+      <td>Greedy Algorithms</td>
+      <td class="llos">
+<span class="k">Explain how memoization optimizes recursive dynamic programming solutions and its impact on algorithm runtime in PostgreSQL 16.</span><span class="s">Implement a longest common subsequence problem using dynamic programming in Python 3.12 with a focus on using the built-in `zip` function and list comprehensions.</span><span class="a">Collaborate with peers to debug and optimize a dynamic programming algorithm in PostgreSQL 16, ensuring the solution is efficient and scalable.</span>      </td>
+      <td>Face-to-face lecture on Dynamic Programming: Advanced using PostgreSQL 16 + Hands-on Lab in Python 3.12: Implement advanced dynamic programming problems</td>
+      <td>Project Rubric</td>
+      <td>Final Project + Rubric</td>
+      <td>CLO1, CLO3</td>
+    </tr>
+    <tr class="">
+      <td>Week 16</td>
+      <td>Backtracking and Branch-and-Bound</td>
+      <td class="llos">
+<span class="k">Identify the Big O notation for sorting algorithms such as QuickSort and MergeSort, and explain why MergeSort is considered O(n log n).</span><span class="s">Apply a graph algorithm to find the shortest path in a weighted graph using Python 3.12 with a priority queue implemented with a heap.</span><span class="a">Collaborate in a group to debug and optimize a Python 3.12 program that calculates the number of operations for a given algorithm, ensuring precision and efficiency.</span>      </td>
+      <td>Face-to-face lecture on Algorithmic Complexity: Advanced using Git + Hands-on Lab in Python 3.12: Analyze advanced algorithmic complexity</td>
+      <td>Recitation</td>
+      <td>Recitation Log</td>
+      <td>CLO1, CLO5</td>
+    </tr>
+    <tr class="">
+      <td>Week 17</td>
+      <td>Capstone Project Preparation</td>
+      <td class="llos">
+<span class="k">Identify the key components and requirements for a final project in Python 3.12, such as the use of pytest for automated testing.</span><span class="s">Apply best practices for project documentation and version control using Git, such as creating a README file and committing changes to a GitHub repository.</span><span class="a">Demonstrate persistence while debugging a final project issue in GDB, such as a segmentation fault, during the implementation of a complex algorithm in Python 3.12.</span>      </td>
+      <td>Face-to-face lecture on Final Project Preparation using VS Code + Hands-on Lab in Python 3.12: Final project preparation</td>
+      <td>Project Rubric</td>
+      <td>Final Project + Rubric</td>
+      <td>CLO2, CLO3, CLO6</td>
+    </tr>
+    <tr class="exam-week">
+      <td>Week 18</td>
+      <td>Final Project Defense and Comprehensive Review</td>
+      <td class="llos">
+<span class="k">Explain how to use GDB to debug a C++17 program and identify common issues.</span><span class="s">Apply the principles of object-oriented design to integrate a PostgreSQL 16 database into a C++17 project.</span><span class="a">Collaborate with peers to prepare and present a comprehensive review of a final project in a professional manner.</span>      </td>
+      <td>Face-to-face lecture on Final Project Defense and Comprehensive Review using GDB + Hands-on Lab in C++17: Final project defense and review</td>
+      <td>Final Project Defense</td>
+      <td>Final Project Defense Rubric</td>
+      <td>CLO1, CLO2, CLO3, CLO5, CLO6</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Course Evaluation: Base 0 Grade Computation</h2>
+
+<div class="grading-block">
+  <strong>Class Standing</strong>
+  <span class="grading-formula">Class Standing = (Quizzes &times; 30%) + (Research &times; 20%) + (Seatwork/Lab &times; 50%)</span>
+</div>
+
+<div class="grading-block">
+  <strong>Term Grade</strong>
+  <span class="grading-formula">Term Grade = (Class Standing &times; 70%) + (Major Exam &times; 30%)</span>
+</div>
+
+<div class="grading-block">
+  <strong>Final Grade</strong>
+  <span class="grading-formula">Final Grade = Average of Preliminary, Midterm, and Final Period Grades</span>
+  <div class="grading-note">The minimum passing grade is 75% or its equivalent of 3.0.</div>
+</div>
+
+<h2>Institutional Note</h2>
+<p style="font-size:13px;">
+  This syllabus was drafted using a locally hosted AI model
+  (qwen2.5:3b via Ollama) and validated against the College of
+  Computer Studies OBE schema. All course outcomes, lesson outcomes, and
+  weekly schedules were reviewed for alignment with the CCS curriculum
+  before publication.
+</p>
+<p style="font-size:13px;">
+  Recommended readings and supplementary materials for this course will
+  be provided by the assigned instructor at the start of the term.
+</p>
+
+<footer class="doc-footer">
+  Generated 2026-10-02 22:34 &middot; Model: qwen2.5:3b &middot;
+  5 CLOs &middot;
+  18 weeks &middot;
+  College of Computer Studies, UPHSD
+</footer>
+<script>
+  // Export to PDF: click -> browser print dialog -> "Save as PDF".
+  // Redundant with the inline onclick on the button, but kept here so the
+  // behavior survives if inline handlers are stripped by a sanitizer.
+  (function () {
+    var btn = document.querySelector('.export-pdf-button');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.print();
+      });
+    }
+  })();
+</script>
+</body>
+</html>

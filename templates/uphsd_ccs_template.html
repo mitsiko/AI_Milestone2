@@ -1,0 +1,590 @@
+{#
+  uphsd_ccs_template.html
+  Milestone 2 - Jinja2 template for the OBE Syllabus Generator.
+
+  Renders a SyllabusSchema-shaped dict into the official CCS syllabus layout.
+  Consumed by export_engine.py; the template itself does no data fetching.
+
+  Expected context variables:
+    payload            : dict shaped like SyllabusSchema.model_dump()
+    generated_at       : str, e.g. "2026-10-02 15:42"
+    model_name         : str, e.g. "qwen2.5:3b"
+
+  Institutional constants (PVM, GA table, PEO/PLO matrices) are static text
+  taken verbatim from the reference sample_syllabus.html. They do not change
+  between courses and are intentionally hardcoded here.
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ payload.course_metadata.course_code }} &mdash; {{ payload.course_metadata.course_title }} | Course Syllabus</title>
+<style>
+  @page { size: A4; margin: 20mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.5;
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 28px;
+    background: #fff;
+  }
+  h1, h2, h3, h4 {
+    font-family: Georgia, "Times New Roman", serif;
+    color: #7f1416;
+    margin: 0 0 8px;
+  }
+  h1 { font-size: 26px; text-align: center; letter-spacing: 0.4px; }
+  h2 {
+    font-size: 18px;
+    border-bottom: 2px solid #7f1416;
+    padding-bottom: 4px;
+    margin-top: 34px;
+  }
+  h3 { font-size: 15px; margin-top: 22px; }
+  h4 { font-size: 13px; margin-top: 16px; color: #333; }
+  header.doc-header {
+    text-align: center;
+    border-bottom: 3px double #7f1416;
+    padding-bottom: 18px;
+    margin-bottom: 26px;
+  }
+  header.doc-header .institution {
+    font-size: 12px; color: #555; letter-spacing: 1.2px;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  header.doc-header .university {
+    font-size: 14px; color: #333; letter-spacing: 0.6px;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  header.doc-header .college {
+    font-size: 15px; color: #7f1416; font-weight: bold; margin-bottom: 14px;
+  }
+  header.doc-header .subtitle { font-size: 13px; color: #333; margin-top: 6px; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+  th, td {
+    border: 1px solid #b8b8b8;
+    padding: 7px 9px;
+    vertical-align: top;
+    text-align: left;
+  }
+  th {
+    background: #f7eeee;
+    color: #7f1416;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  tr.exam-week td { background: #fdf6e3; font-weight: 600; }
+  tr:nth-child(even):not(.exam-week) td { background: #fafafa; }
+
+  table.matrix td, table.matrix th { text-align: center; padding: 6px 8px; }
+  table.matrix td:first-child, table.matrix th:first-child { text-align: left; }
+  table.matrix .section-header td {
+    background: #f0e4e4; font-weight: 700; color: #7f1416;
+    text-align: left; font-size: 12px;
+  }
+  .check { color: #7f1416; font-weight: 700; }
+
+  table.info-table td:first-child {
+    background: #f7eeee;
+    width: 24%;
+    font-weight: 600;
+    color: #7f1416;
+  }
+
+  .llos .k, .llos .s, .llos .a { display: block; margin: 3px 0; }
+  .llos .k::before { content: "K: "; font-weight: 700; color: #7f1416; }
+  .llos .s::before { content: "S: "; font-weight: 700; color: #7f1416; }
+  .llos .a::before { content: "A: "; font-weight: 700; color: #7f1416; }
+
+  .grading-block {
+    background: #f7eeee;
+    border-left: 4px solid #7f1416;
+    padding: 12px 16px;
+    margin: 10px 0 16px;
+    font-size: 13px;
+  }
+  .grading-formula {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12.5px;
+    display: block;
+    margin: 6px 0;
+  }
+  .grading-note { font-size: 12px; color: #555; margin-top: 8px; }
+
+  .pvm-block { margin: 10px 0 14px; }
+  .pvm-block h3 { margin-bottom: 4px; }
+  .pvm-block p { margin: 4px 0 8px; font-size: 13px; text-align: justify; }
+
+  .keywords {
+    font-size: 12px; color: #555; background: #f5f5f5;
+    padding: 8px 12px; border-left: 3px solid #7f1416;
+    margin: 8px 0 16px;
+  }
+
+  ol.values-list, ul.values-list {
+    margin: 6px 0 14px 22px; padding: 0; font-size: 13px;
+  }
+  ol.values-list li, ul.values-list li { margin: 3px 0; }
+
+  footer.doc-footer {
+    margin-top: 44px;
+    padding-top: 12px;
+    border-top: 1px solid #ccc;
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+  }
+
+  /* --- Export to PDF floating button (Milestone 2) ------------------- */
+  .export-pdf-button {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #7f1416;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease,
+                box-shadow 0.15s ease;
+  }
+  .export-pdf-button:hover {
+    background: #5e0f10;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  }
+  .export-pdf-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+  .export-pdf-button:focus-visible {
+    outline: 2px solid #7f1416;
+    outline-offset: 2px;
+  }
+  .export-pdf-button .icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  @media print {
+    body { margin: 0; max-width: none; padding: 0; }
+    h2 { page-break-after: avoid; }
+    tr { page-break-inside: avoid; }
+    table { page-break-inside: auto; }
+    .export-pdf-button { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<button
+  type="button"
+  class="export-pdf-button"
+  onclick="window.print();"
+  title="Print / Save as PDF"
+  aria-label="Export syllabus to PDF"
+>
+  <span class="icon" aria-hidden="true">&#x1F5A8;</span>
+  <span>Export to PDF</span>
+</button>
+<header class="doc-header">
+  <div class="institution">University of Perpetual Help System DALTA</div>
+  <div class="university">College of Computer Studies</div>
+  <div class="college">Course Syllabus</div>
+  <h1>{{ payload.course_metadata.course_code }} &mdash; {{ payload.course_metadata.course_title }}</h1>
+  <div class="subtitle">First Semester, School Year 2025&ndash;2026</div>
+</header>
+
+{# ------------------------------------------------------------------ #}
+{# COURSE INFORMATION                                                  #}
+{# ------------------------------------------------------------------ #}
+<h2>Course Information</h2>
+<table class="info-table">
+  <tr><td>Course Code</td><td>{{ payload.course_metadata.course_code }}</td></tr>
+  <tr><td>Course Title</td><td>{{ payload.course_metadata.course_title }}</td></tr>
+  <tr><td>Course Description</td><td>{{ payload.course_metadata.course_description }}</td></tr>
+  <tr>
+    <td>Prerequisite(s)</td>
+    <td>
+      {% if payload.course_metadata.prerequisites %}
+        {{ payload.course_metadata.prerequisites | join(", ") }}
+      {% else %}
+        &mdash;
+      {% endif %}
+    </td>
+  </tr>
+  <tr><td>Credit Units</td><td>{{ payload.course_metadata.credits }} Units</td></tr>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# INSTITUTIONAL PVM                                                   #}
+{# ------------------------------------------------------------------ #}
+<h2>Institutional PVM</h2>
+
+<div class="pvm-block">
+  <h3>Philosophy</h3>
+  <p>The University of Perpetual Help System DALTA believes and invokes Divine Guidance in the betterment of the quality of life through national development and transformation, which are predicated upon the quality of education of its people. Towards this end, the Institution is committed to the ideals of teaching, community service and research as it nurtures the value of "Helpers of God", with "Character Building is Nation Building" as its guiding principle.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Vision</h3>
+  <p>The University of Perpetual Help System DALTA shall emerge as a premier university in the Philippines. It shall provide a venue for the pursuit of excellence in academics, technology and research through local and international linkages.</p>
+  <p>The University shall take the role of a catalyst for human development. It shall inculcate Christian values and Catholic doctrine, as a way of strengthening the moral fiber of the Filipino, a people who are "Helpers of God", proud of their race and prepared for the exemplary global participation in the sciences, arts, humanities, sports and business.</p>
+  <p>It foresees the Filipino people enjoying a quality of life in abundance, living in peace and building a nation that the next generation will nourish, cherish and value.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Mission</h3>
+  <p>The University of Perpetual Help System DALTA is dedicated to the development of the Filipino as a LEADER. It aims to graduate DYNAMIC STUDENTS who are physically, intellectually, socially and spiritually committed to the achievement of the highest quality of life.</p>
+  <p>As a system of service in health and in education, it is dedicated to the FORMATION OF CHRIST-CENTERED, SERVICE ORIENTED, AND RESEARCH-DRIVEN INDIVIDUALS WITH GREAT SOCIAL CONCERN and COMMITMENT TO THE DELIVERY OF QUALITY EDUCATION AND HEALTH CARE.</p>
+  <p>It shall produce Perpetualities as "HELPERS OF GOD", a vital ingredient to nation building.</p>
+</div>
+
+<div class="keywords">
+  <strong>Mission Keywords:</strong>
+  A &mdash; LEADER; B &mdash; DYNAMIC STUDENTS;
+  C &mdash; FORMATION OF CHRIST-CENTERED, SERVICE ORIENTED, AND RESEARCH-DRIVEN INDIVIDUALS;
+  D &mdash; WITH GREAT SOCIAL CONCERN;
+  E &mdash; COMMITMENT TO THE DELIVERY OF QUALITY EDUCATION AND HEALTH CARE;
+  F &mdash; HELPERS OF GOD
+</div>
+
+<h3>Core Values</h3>
+<ol class="values-list">
+  <li>Love of God, Love of Self, Family, and Neighbor</li>
+  <li>Love of Country and Good Governance</li>
+  <li>Academic and Professional Excellence</li>
+  <li>Health and Ecological Consciousness</li>
+  <li>Peace and Global Solidarity</li>
+  <li>Filipino Christian Leadership</li>
+  <li>Value of Catholic Doctrine</li>
+  <li>UPHSD and the Perpetualite</li>
+</ol>
+
+<h3>College of Computer Studies &mdash; Pillars of Excellence</h3>
+<ol class="values-list">
+  <li>Excellence in Teaching and Learning</li>
+  <li>Excellence in Community Extension Service</li>
+  <li>Excellence in Research and Innovation</li>
+</ol>
+
+{# ------------------------------------------------------------------ #}
+{# COLLEGE PVM                                                         #}
+{# ------------------------------------------------------------------ #}
+<h2>College of Computer Studies PVM</h2>
+
+<div class="pvm-block">
+  <h3>Philosophy</h3>
+  <p>The College of Computer Studies is committed to the realization of the university's objective of providing a venue for the pursuit of excellence particularly the areas of information technology education.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Vision</h3>
+  <p>The UPHSD College of Computer Studies envisions a cadre of graduates who shall successfully meet the challenges of a technology driven global society. Hence the college shall endeavor to become the leading Information Technology School in the CALABARZON Area offering quality instruction in IT and CS.</p>
+</div>
+
+<div class="pvm-block">
+  <h3>Mission</h3>
+  <p>The College cultivates a culture of excellence by delivering quality programs in IT and CS to produce competent graduates who shall meet the needs of the IT industry locally and internationally.</p>
+</div>
+
+<h3>College Objectives</h3>
+<ol class="values-list">
+  <li>To act in accordance with the specified standards of the Commission on Higher Education (CHED) in connection with the BSCS and BSIT programs.</li>
+  <li>To be knowledgeable in the concept and theories, algorithmic foundations, implementation, and application of information and computing solutions.</li>
+  <li>To demonstrate effectiveness as team members or as team leaders in their jobs and careers.</li>
+  <li>To be committed to high standards of professionalism.</li>
+  <li>To be linked with the ICT industries and the Students Apprenticeship Program of the BSCS and BSIT programs.</li>
+</ol>
+
+{# ------------------------------------------------------------------ #}
+{# GRADUATE ATTRIBUTES x MISSION KEYWORDS                              #}
+{# ------------------------------------------------------------------ #}
+<h2>Graduate Attributes &times; Mission Keywords</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:52%;">Graduate Attributes</th>
+      <th colspan="6">Mission Key Words</th>
+    </tr>
+    <tr>
+      <th style="width:8%;">A</th>
+      <th style="width:8%;">B</th>
+      <th style="width:8%;">C</th>
+      <th style="width:8%;">D</th>
+      <th style="width:8%;">E</th>
+      <th style="width:8%;">F</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="section-header"><td colspan="7">CHARACTER</td></tr>
+    <tr><td>1. Graduates demonstrate a deep faith in God, embodying professional, humanistic, and altruistic values in their personal and professional lives.</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>2. Graduates serve as Helpers of God, dedicating their knowledge and skills to the betterment of others.</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td class="check">&check;</td></tr>
+    <tr><td>3. Graduates exemplify servant leadership, guiding others with integrity, humility, and a commitment to the common good.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td><td class="check">&check;</td></tr>
+    <tr><td>4. Graduates uphold ethical responsibility in both physical and digital environments, practicing responsible citizenship and promoting positive engagement and interactions.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+
+    <tr class="section-header"><td colspan="7">COMPETENCE</td></tr>
+    <tr><td>5. Graduates communicate effectively across diverse contexts, demonstrating clarity, coherence, and cultural sensitivity.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>6. Graduates apply critical and creative thinking to solve complex problems and innovate in their respective fields.</td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>7. Graduates exhibit competence and excellence in their professional practice, continuously striving for high standards of performance.</td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+    <tr><td>8. Graduates embrace lifelong learning, engage in reflective practice, and contribute to research and innovation for societal advancement.</td><td class="check">&check;</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td></tr>
+
+    <tr class="section-header"><td colspan="7">COMMITMENT TO SERVICE</td></tr>
+    <tr><td>9. Graduates actively contribute to nation-building by engaging in meaningful service and leadership roles in their communities.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td></tr>
+    <tr><td>10. Graduates advocate for environmental sustainability, integrating ecological consciousness into their decisions and actions.</td><td></td><td></td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>11. Graduates collaborate effectively in diverse teams, demonstrating commitment, adaptability and teamwork in achieving shared goals.</td><td class="check">&check;</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td><td></td></tr>
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# PEO x GRADUATE ATTRIBUTES                                           #}
+{# ------------------------------------------------------------------ #}
+<h2>Program Educational Objectives (PEOs) &times; Graduate Attributes</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="3" style="width:44%;">Program Educational Objectives<br><small>After five years of graduation, the graduates can:</small></th>
+      <th colspan="11">Graduate Attributes</th>
+    </tr>
+    <tr>
+      <th colspan="4">Character</th>
+      <th colspan="4">Competence</th>
+      <th colspan="3">Commitment to Service</th>
+    </tr>
+    <tr>
+      <th>GA1</th><th>GA2</th><th>GA3</th><th>GA4</th>
+      <th>GA5</th><th>GA6</th><th>GA7</th><th>GA8</th>
+      <th>GA9</th><th>GA10</th><th>GA11</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. Technical Mastery and Innovation. Graduates will demonstrate strong technical competence and creative problem-solving skills in designing, implementing, and managing IT systems that address real-world challenges in organizations and communities.</td>
+      <td></td><td></td><td></td><td></td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td></td><td></td><td></td>
+    </tr>
+    <tr>
+      <td>2. Professionalism, Leadership, and Ethics. Graduates will exemplify ethical leadership, professionalism, and collaborative engagement in multidisciplinary IT projects, ensuring adherence to legal, social, and organizational standards.</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td></td><td></td><td></td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+    <tr>
+      <td>3. Lifelong Learning and Global Adaptability. Graduates will pursue lifelong learning and continuous skill enhancement to remain responsive to evolving technologies, industry demands, and global IT trends.</td>
+      <td></td><td></td><td></td><td></td>
+      <td></td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+    <tr>
+      <td>4. Societal Contribution and Sustainable Development. Graduates will contribute to inclusive and sustainable digital transformation by developing IT solutions that address societal, environmental, and organizational needs across diverse sectors.</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# PLO x PEO                                                           #}
+{# ------------------------------------------------------------------ #}
+<h2>Program Learning Outcomes (PLOs) &times; Program Educational Objectives (PEOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:70%;">Program Learning Outcomes (PLOs)</th>
+      <th colspan="4">Program Educational Objectives (PEOs)</th>
+    </tr>
+    <tr>
+      <th>1</th><th>2</th><th>3</th><th>4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1. Computing Knowledge and Problem Solving. Apply knowledge of computing, science, and mathematics to analyze, design, and solve complex IT problems in various domains.</td><td class="check">&check;</td><td></td><td></td><td></td></tr>
+    <tr><td>2. IT Systems Design and Integration. Design, implement, and optimize IT-based solutions that meet user requirements, industry standards, and sustainability goals.</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+    <tr><td>3. Innovative and Interactive IT Applications. Develop creative, immersive, and user-centered digital systems using advanced tools, emerging technologies, and programming environments.</td><td class="check">&check;</td><td></td><td></td><td class="check">&check;</td></tr>
+    <tr><td>4. Communication and Collaboration. Communicate effectively in oral, written, and digital forms and work productively in diverse teams to deliver quality IT solutions.</td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+    <tr><td>5. Ethics, Legal, and Social Responsibility. Uphold ethical, legal, and professional standards in IT practice, ensuring data privacy, security, and inclusivity while addressing organizational and societal challenges.</td><td></td><td class="check">&check;</td><td></td><td></td></tr>
+    <tr><td>6. Lifelong Learning and Professional Development. Engage in lifelong learning to stay current with advancements in information technology and to support professional growth.</td><td></td><td class="check">&check;</td><td class="check">&check;</td><td></td></tr>
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# CLO x PLO  (dynamic)                                                #}
+{# ------------------------------------------------------------------ #}
+<h2>Course Learning Outcomes (CLOs) &times; Program Learning Outcomes (PLOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:70%;">Course Learning Outcomes (CLOs)<br><small>At the end of the course, the students can:</small></th>
+      <th colspan="6">Program Learning Outcomes (PLOs)</th>
+    </tr>
+    <tr>
+      <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for co in payload.course_outcomes %}
+    <tr>
+      <td>{{ loop.index }}. ({{ co.ksa_category }}) {{ co.description }}</td>
+      {% for plo in [1, 2, 3, 4, 5, 6] %}
+        <td>
+          {% if co.mapped_plo == plo %}<span class="check">&check;</span>{% endif %}
+        </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# LLO x CLO  (dynamic)                                                #}
+{# ------------------------------------------------------------------ #}
+<h2>Lesson Learning Outcomes (LLOs) &times; Course Learning Outcomes (CLOs)</h2>
+<table class="matrix">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:60%;">Lesson Learning Outcomes (LLOs)<br><small>At the end of the lesson, the students can:</small></th>
+      <th colspan="{{ payload.course_outcomes | length }}">Course Learning Outcomes (CLOs)</th>
+    </tr>
+    <tr>
+      {% for co in payload.course_outcomes %}
+        <th>{{ loop.index }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for w in payload.weekly_schedule %}
+      <tr class="section-header">
+        <td colspan="{{ 1 + payload.course_outcomes | length }}">
+          WEEK {{ w.week_number }} &mdash; {{ w.topic }}
+        </td>
+      </tr>
+      {% for llo in w.lesson_outcomes %}
+        <tr>
+          <td>{{ llo.description }}</td>
+          {% for co in payload.course_outcomes %}
+            <td>
+              {% if co.clo_id in w.aligned_clo %}<span class="check">&check;</span>{% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# WEEKLY SCHEDULE                                                     #}
+{# ------------------------------------------------------------------ #}
+<h2>Course Syllabus &mdash; Weekly Schedule</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width:6%;">Week</th>
+      <th style="width:14%;">Topic</th>
+      <th style="width:26%;">Lesson Learning Outcomes (K / S / A)</th>
+      <th style="width:16%;">Teaching Learning Activity (TLA)</th>
+      <th style="width:12%;">Assessment Tool</th>
+      <th style="width:12%;">Result / Evidence</th>
+      <th style="width:14%;">Aligned CLO</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for w in payload.weekly_schedule %}
+    <tr class="{% if w.week_number in [9, 18] %}exam-week{% endif %}">
+      <td>Week {{ w.week_number }}</td>
+      <td>{{ w.topic }}</td>
+      <td class="llos">
+        {% for llo in w.lesson_outcomes %}
+          {% if llo.ksa_category == "K" %}<span class="k">{{ llo.description }}</span>{% endif %}
+          {% if llo.ksa_category == "S" %}<span class="s">{{ llo.description }}</span>{% endif %}
+          {% if llo.ksa_category == "A" %}<span class="a">{{ llo.description }}</span>{% endif %}
+        {% endfor %}
+      </td>
+      <td>{{ w.teaching_activities }}</td>
+      <td>{{ w.assessment }}</td>
+      <td>{{ w.evidence }}</td>
+      <td>{{ w.aligned_clo | join(", ") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ------------------------------------------------------------------ #}
+{# GRADING SYSTEM                                                      #}
+{# ------------------------------------------------------------------ #}
+<h2>Course Evaluation: Base 0 Grade Computation</h2>
+
+<div class="grading-block">
+  <strong>Class Standing</strong>
+  <span class="grading-formula">Class Standing = (Quizzes &times; 30%) + (Research &times; 20%) + (Seatwork/Lab &times; 50%)</span>
+</div>
+
+<div class="grading-block">
+  <strong>Term Grade</strong>
+  <span class="grading-formula">Term Grade = (Class Standing &times; 70%) + (Major Exam &times; 30%)</span>
+</div>
+
+<div class="grading-block">
+  <strong>Final Grade</strong>
+  <span class="grading-formula">Final Grade = Average of Preliminary, Midterm, and Final Period Grades</span>
+  <div class="grading-note">The minimum passing grade is 75% or its equivalent of 3.0.</div>
+</div>
+
+{# ------------------------------------------------------------------ #}
+{# INSTITUTIONAL NOTE                                                  #}
+{# ------------------------------------------------------------------ #}
+<h2>Institutional Note</h2>
+<p style="font-size:13px;">
+  This syllabus was drafted using a locally hosted AI model
+  ({{ model_name }} via Ollama) and validated against the College of
+  Computer Studies OBE schema. All course outcomes, lesson outcomes, and
+  weekly schedules were reviewed for alignment with the CCS curriculum
+  before publication.
+</p>
+<p style="font-size:13px;">
+  Recommended readings and supplementary materials for this course will
+  be provided by the assigned instructor at the start of the term.
+</p>
+
+<footer class="doc-footer">
+  Generated {{ generated_at }} &middot; Model: {{ model_name }} &middot;
+  {{ payload.course_outcomes | length }} CLOs &middot;
+  {{ payload.weekly_schedule | length }} weeks &middot;
+  College of Computer Studies, UPHSD
+</footer>
+<script>
+  // Export to PDF: click -> browser print dialog -> "Save as PDF".
+  // Redundant with the inline onclick on the button, but kept here so the
+  // behavior survives if inline handlers are stripped by a sanitizer.
+  (function () {
+    var btn = document.querySelector('.export-pdf-button');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.print();
+      });
+    }
+  })();
+</script>
+</body>
+</html>
