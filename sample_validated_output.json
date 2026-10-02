@@ -66,7 +66,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implementing basic operations",
+      "teaching_activities": "Face-to-face lecture on Introduction to Data Structures + Hands-on Lab in VS Code: applying Introduction to Data Structures to a worked problem",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -95,7 +95,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Stacks and Queues using C++17 + Hands-on Lab in GDB: Debugging and Testing",
+      "teaching_activities": "Face-to-face lecture on Stacks and Queues + Hands-on Lab in PyCharm: applying Stacks and Queues to a worked problem",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -122,7 +122,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Trees and Graphs using PostgreSQL 16 + Hands-on Lab in Jupyter Notebook: Implementing BFS and DFS",
+      "teaching_activities": "Face-to-face lecture on Trees and Graphs + Hands-on Lab in C++17 with GDB: applying Trees and Graphs to a worked problem",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -150,7 +150,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Sorting Algorithms using Google Test + Hands-on Lab in CMake: Implementing QuickSort",
+      "teaching_activities": "Face-to-face lecture on Sorting Algorithms + Hands-on Lab in Python 3.12: applying Sorting Algorithms to a worked problem",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -178,7 +178,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Searching Algorithms using Catch2 + Hands-on Lab in Git: Implementing Binary Search",
+      "teaching_activities": "Face-to-face lecture on Searching Algorithms + Hands-on Lab in Jupyter Notebook: applying Searching Algorithms to a worked problem",
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
@@ -206,7 +206,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Recursion using GCC + Hands-on Lab in Valgrind: Debugging Recursive Functions",
+      "teaching_activities": "Face-to-face lecture on Recursion + Hands-on Lab in CMake with Google Test: applying Recursion to a worked problem",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -233,7 +233,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Dynamic Programming using Python 3.12 + Hands-on Lab in PyCharm: Implementing Knapsack Problem",
+      "teaching_activities": "Face-to-face lecture on Dynamic Programming + Hands-on Lab in PostgreSQL 16: applying Dynamic Programming to a worked problem",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -261,7 +261,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Algorithmic Complexity using C++17 + Hands-on Lab in GDB: Analyzing Algorithm Performance",
+      "teaching_activities": "Face-to-face lecture on Algorithmic Complexity + Hands-on Lab in Git: applying Algorithmic Complexity to a worked problem",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -289,7 +289,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Midterm Review using Python 3.12 + Hands-on Lab in PyCharm: Reviewing and Debugging",
+      "teaching_activities": "Face-to-face lecture on Midterm Assessment and Review + Hands-on Lab in Valgrind: applying Midterm Assessment and Review to a worked problem",
       "assessment": "Midterm Exam",
       "evidence": "Midterm Exam Answer Sheet",
       "aligned_clo": [
@@ -320,7 +320,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Arrays and Linked Lists using Python 3.12 + Hands-on Lab in PyCharm: Implementing Doubly Linked Lists",
+      "teaching_activities": "Face-to-face lecture on Graph Traversal Algorithms + Hands-on Lab in Catch2: applying Graph Traversal Algorithms to a worked problem",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -348,7 +348,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Trees and Graphs using PostgreSQL 16 + Hands-on Lab in Jupyter Notebook: Implementing Dijkstra's Algorithm",
+      "teaching_activities": "Face-to-face lecture on Shortest Path Algorithms + Hands-on Lab in VS Code: applying Shortest Path Algorithms to a worked problem",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -377,7 +377,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Sorting Algorithms using Google Test + Hands-on Lab in CMake: Implementing MergeSort",
+      "teaching_activities": "Face-to-face lecture on Minimum Spanning Trees + Hands-on Lab in PyCharm: applying Minimum Spanning Trees to a worked problem",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -406,7 +406,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Searching Algorithms using Catch2 + Hands-on Lab in Git: Implementing Jump Search",
+      "teaching_activities": "Face-to-face lecture on Hash Tables and Hashing + Hands-on Lab in C++17 with GDB: applying Hash Tables and Hashing to a worked problem",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -434,7 +434,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Recursion using GCC + Hands-on Lab in Valgrind: Debugging Recursive Algorithms",
+      "teaching_activities": "Face-to-face lecture on Balanced Trees (AVL, Red-Black) + Hands-on Lab in Python 3.12: applying Balanced Trees (AVL, Red-Black) to a worked problem",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -448,21 +448,21 @@
       "lesson_outcomes": [
         {
           "llo_id": "LLO15.1",
-          "description": "Identify the Greedy Algorithm strategy and explain why it is suitable for the Longest Common Subsequence problem.",
+          "description": "Explain the core concepts, terminology, and purpose of Greedy Algorithms.",
           "ksa_category": "K"
         },
         {
           "llo_id": "LLO15.2",
-          "description": "Apply the Greedy Algorithm to implement the Longest Common Subsequence in Python 3.12, using std::vector for dynamic programming.",
+          "description": "Apply the principles of Greedy Algorithms to solve a small, worked example in a lab setting.",
           "ksa_category": "S"
         },
         {
           "llo_id": "LLO15.3",
-          "description": "Collaborate with peers to debug and optimize the Greedy Algorithm implementation in PyCharm, leveraging pytest for testing.",
+          "description": "Collaborate with peers to review, critique, and improve an implementation of Greedy Algorithms.",
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Dynamic Programming using Python 3.12 + Hands-on Lab in PyCharm: Implementing Longest Common Subsequence",
+      "teaching_activities": "Face-to-face lecture on Greedy Algorithms + Hands-on Lab in Jupyter Notebook: applying Greedy Algorithms to a worked problem",
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
@@ -491,7 +491,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Advanced Algorithmic Complexity using C++17 + Hands-on Lab in GDB: Analyzing Algorithm Efficiency",
+      "teaching_activities": "Face-to-face lecture on Backtracking and Branch-and-Bound + Hands-on Lab in CMake with Google Test: applying Backtracking and Branch-and-Bound to a worked problem",
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
@@ -520,7 +520,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Final Project Preparation using Python 3.12 + Hands-on Lab in PyCharm: Setting up Project Environment",
+      "teaching_activities": "Face-to-face lecture on Capstone Project Preparation + Hands-on Lab in PostgreSQL 16: applying Capstone Project Preparation to a worked problem",
       "assessment": "Project Rubric",
       "evidence": "Final Project + Rubric",
       "aligned_clo": [
@@ -549,7 +549,7 @@
           "ksa_category": "A"
         }
       ],
-      "teaching_activities": "Face-to-face lecture on Final Project Defense using Python 3.12 + Hands-on Lab in PyCharm: Reviewing Final Project",
+      "teaching_activities": "Face-to-face lecture on Final Project Defense and Comprehensive Review + Hands-on Lab in Git: applying Final Project Defense and Comprehensive Review to a worked problem",
       "assessment": "Final Project Defense",
       "evidence": "Final Project Defense Rubric",
       "aligned_clo": [

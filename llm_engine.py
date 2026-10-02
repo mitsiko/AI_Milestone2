@@ -478,7 +478,8 @@ _TOPIC_SYNONYMS: dict[str, set[str]] = {
     },
     "greedy": {
         "greedy", "local", "optimal", "exchange", "argument", "activity",
-        "selection", "huffman", "fractional", "knapsack",
+        "selection", "huffman", "fractional", "knapsack", "interval",
+        "scheduling",
     },
     "backtracking": {
         "backtracking", "branch", "bound", "state", "space", "pruning",
@@ -532,6 +533,67 @@ _TOPIC_SYNONYMS: dict[str, set[str]] = {
     },
 }
 
+# ---- Topic required-concept map (Stage 10) --------------------------------
+# For some topics, matching a topic keyword is too weak: the LLM can mention
+# the topic by name while actually teaching a different concept. This map
+# adds a STRICTER concept check that runs after _llos_match_topic.
+#
+# Each key is a substring of a topic (lowercased). Each value is a set of
+# CONCRETE concept terms; at least one must appear in the week's LLO
+# descriptions for the week to be accepted. If none does, the week is
+# replaced with the fallback for its topic.
+#
+# Note: meta mentions like "greedy algorithm" or "greedy strategy" are NOT
+# in the required set, because they can appear in LLOs whose content is
+# actually about a different topic (e.g. LCS, DP).
+_TOPIC_REQUIRED_CONCEPTS: dict[str, set[str]] = {
+    "greedy": {
+        "huffman",
+        "activity selection",
+        "activity-selection",
+        "fractional knapsack",
+        "fractional-knapsack",
+        "interval scheduling",
+        "interval-scheduling",
+        "coin change",
+        "coin-change",
+        "exchange argument",
+        "exchange-argument",
+        "greedy choice property",
+        "minimum spanning tree",  # Prim/Kruskal are greedy algorithms
+        "prim",
+        "kruskal",
+    },
+    "dynamic programming": {
+        "memoization",
+        "memoize",
+        "tabulation",
+        "overlapping subproblem",
+        "overlapping-subproblem",
+        "optimal substructure",
+        "optimal-substructure",
+        "bottom-up",
+        "top-down",
+        "knapsack",
+        "longest common subsequence",
+        "longest-common-subsequence",
+        "lcs",
+    },
+    "backtracking": {
+        "state space",
+        "state-space",
+        "pruning",
+        "constraint satisfaction",
+        "constraint-satisfaction",
+        "n-queens",
+        "eight queens",
+        "eight-queens",
+        "branch and bound",
+        "branch-and-bound",
+        "sudoku",
+    },
+}
+
 
 def _llos_match_topic(topic: str, llos: list) -> bool:
     """Return True if at least one LLO mentions a topic keyword or synonym."""
@@ -552,6 +614,19 @@ def _llos_match_topic(topic: str, llos: list) -> bool:
             return True
     return False
 
+def _llos_satisfy_required_concepts(topic: str, llos: list) -> bool:
+    """Return True if the week's LLOs satisfy the topic's required-concept check."""
+    topic_lower = (topic or "").lower()
+    required: set[str] = set()
+    for needle, concepts in _TOPIC_REQUIRED_CONCEPTS.items():
+        if needle in topic_lower:
+            required |= concepts
+
+    if not required:
+        return True
+
+    joined = " ".join(llo.description.lower() for llo in llos)
+    return any(concept in joined for concept in required)
 
 # ---- Deterministic topic -> LLO fallback table (Stage 7) ------------------
 # Each entry is a K/S/A triple. Every text:
@@ -1047,14 +1122,12 @@ def _dedupe_advanced_topics_if_redundant(weeks: list, is_dsa: bool) -> list:
         t = (topic or "").strip().lower()
         if not t:
             return False
-        # Pattern 2: strip a leading "advanced " then re-test.
         t_stripped = t
         if t_stripped.startswith("advanced "):
             t_stripped = t_stripped[len("advanced "):].strip()
         for earlier in weeks_1_8_topics:
             if not earlier:
                 continue
-            # Pattern 1: direct substring match either way.
             if earlier in t or t in earlier:
                 return True
             if earlier in t_stripped or t_stripped in earlier:
@@ -1074,17 +1147,53 @@ def _dedupe_advanced_topics_if_redundant(weeks: list, is_dsa: bool) -> list:
     return weeks
 
 
+def _regenerate_tla_from_topic(weeks: list) -> list:
+    """Rebuild teaching_activities from the FINAL topic so the TLA always matches.
+
+    Runs after any topic rewriting (e.g. the DSA bank). Uses the same
+    lecture+lab structure the spec requires, and names a concrete tool per
+    week using a small deterministic tool rotation.
+    """
+    tools = [
+        "VS Code",
+        "PyCharm",
+        "C++17 with GDB",
+        "Python 3.12",
+        "Jupyter Notebook",
+        "CMake with Google Test",
+        "PostgreSQL 16",
+        "Git",
+        "Valgrind",
+        "Catch2",
+    ]
+    for i, wk in enumerate(weeks):
+        topic = (wk.topic or "").strip()
+        tool = tools[i % len(tools)]
+        wk.teaching_activities = (
+            f"Face-to-face lecture on {topic} + Hands-on Lab in {tool}: "
+            f"applying {topic} to a worked problem"
+        )
+    return weeks
+
+# Match 'Dijkstra' or "Dijkstra's" case-insensitively.
+_DIJKSTRA_RE = re.compile(r"\bDijkstra'?s?\b", re.IGNORECASE)
+
+
 # Match 'Dijkstra' or "Dijkstra's" case-insensitively.
 _DIJKSTRA_RE = re.compile(r"\bDijkstra'?s?\b", re.IGNORECASE)
 
 
 def _sanitize_dijkstra_leak(weeks: list) -> list:
-    """Clean up two related issues in LLO descriptions.
+    """Clean up LLO descriptions with Dijkstra in non-graph weeks.
 
-    1. Remove Dijkstra mentions from non-graph weeks.
-    2. Collapse 'a graph algorithm algorithm' duplication.
+    Detection: any 'Dijkstra' mention in a week whose topic does not contain
+    'graph', 'shortest path', or 'spanning tree' is drift. Substitution
+    produces incoherent text (e.g. 'Apply a graph algorithm in a scenario
+    where AVL trees are used...'), so we replace the entire LLO with the
+    topic-appropriate fallback for its KSA category.
 
-    Both passes are UNCONDITIONAL so this function is idempotent.
+    Also collapses the legacy 'graph algorithm algorithm' duplication,
+    which is unconditional and idempotent.
     """
     for wk in weeks:
         topic_lower = (wk.topic or "").lower()
@@ -1094,7 +1203,13 @@ def _sanitize_dijkstra_leak(weeks: list) -> list:
             or "spanning tree" in topic_lower
         )
 
+        fallback_by_ksa = {
+            llo.ksa_category: llo
+            for llo in _fallback_llos_for_topic(wk.topic, wk.week_number)
+        }
+
         for llo in wk.lesson_outcomes:
+            # Unconditional: collapse any legacy duplication.
             llo.description = llo.description.replace(
                 "graph algorithm algorithm", "graph algorithm"
             )
@@ -1102,18 +1217,18 @@ def _sanitize_dijkstra_leak(weeks: list) -> list:
                 "a graph algorithm algorithm", "a graph algorithm"
             )
 
-            if not is_graph_week and _DIJKSTRA_RE.search(llo.description):
-                llo.description = _DIJKSTRA_RE.sub(
-                    "a graph algorithm", llo.description
-                )
-                llo.description = llo.description.replace(
-                    "graph algorithm algorithm", "graph algorithm"
-                )
-                llo.description = llo.description.replace(
-                    "a graph algorithm algorithm", "a graph algorithm"
+            # Dijkstra in a non-graph week = drift. Replace the LLO.
+            if is_graph_week or not _DIJKSTRA_RE.search(llo.description):
+                continue
+
+            replacement = fallback_by_ksa.get(llo.ksa_category)
+            if replacement is not None:
+                llo.description = replacement.description
+                print(
+                    f"    [wk{wk.week_number} LLO{llo.llo_id} replaced: "
+                    f"Dijkstra in a non-graph week]"
                 )
     return weeks
-
 
 # ===========================================================================
 # Pipeline
@@ -1162,8 +1277,11 @@ def generate_syllabus(course_prompt: str) -> dict:
     pass2.weekly_schedule = _assert_balanced_distribution(pass2.weekly_schedule)
     pass2.weekly_schedule = _harmonize_assessment_evidence(pass2.weekly_schedule)
     pass2.weekly_schedule = _dedupe_advanced_topics_if_redundant(pass2.weekly_schedule, is_dsa)
+    pass2.weekly_schedule = _regenerate_tla_from_topic(pass2.weekly_schedule)
+    # NOTE: _sanitize_dijkstra_leak runs AFTER Pass 3, because it operates on
+    # lesson_outcomes, which do not exist on _SkeletonWeek objects yet.
     print("  + aligned_clo focused, assessments varied, evidence harmonized,")
-    print("    advanced topics deduped (if DSA)")
+    print("    advanced topics deduped (if DSA), TLAs regenerated from final topics")
 
     # ---- Pass 3 ----------------------------------------------------------
     print("=== PASS 3: per-week lesson outcomes ===")
@@ -1191,12 +1309,23 @@ def generate_syllabus(course_prompt: str) -> dict:
         )
 
         # ---- Stage 7: topic-match validation -------------------------
+        # Two checks, in order: (1) does the week mention its topic at all,
+        # and (2) for topics with required concepts, does it actually teach
+        # those concepts? Both must pass.
         if not _llos_match_topic(wk.topic, llo_list.lesson_outcomes):
             fallback = _fallback_llos_for_topic(wk.topic, wk.week_number)
             llo_list.lesson_outcomes = fallback
             replacements += 1
             print(
                 f"    [replaced wk{wk.week_number} with fallback LLOs: topic mismatch]"
+            )
+        elif not _llos_satisfy_required_concepts(wk.topic, llo_list.lesson_outcomes):
+            fallback = _fallback_llos_for_topic(wk.topic, wk.week_number)
+            llo_list.lesson_outcomes = fallback
+            replacements += 1
+            print(
+                f"    [replaced wk{wk.week_number} with fallback LLOs: "
+                f"required-concept mismatch]"
             )
 
         full_weeks.append(
@@ -1260,6 +1389,19 @@ def reprocess_existing(path: Path) -> dict:
     payload.weekly_schedule = _assert_balanced_distribution(payload.weekly_schedule)
     payload.weekly_schedule = _harmonize_assessment_evidence(payload.weekly_schedule)
     payload.weekly_schedule = _dedupe_advanced_topics_if_redundant(payload.weekly_schedule, is_dsa)
+    payload.weekly_schedule = _regenerate_tla_from_topic(payload.weekly_schedule)
+
+    # Stage 10: apply the required-concept check on the reprocessed weeks so
+    # `--reprocess-only` produces the same quality as a full pipeline run.
+    for wk in payload.weekly_schedule:
+        if not _llos_satisfy_required_concepts(wk.topic, wk.lesson_outcomes):
+            fallback = _fallback_llos_for_topic(wk.topic, wk.week_number)
+            wk.lesson_outcomes = fallback
+            print(
+                f"  + reprocess: wk{wk.week_number} replaced "
+                f"(required-concept mismatch)"
+            )
+
     payload.weekly_schedule = _sanitize_dijkstra_leak(payload.weekly_schedule)
 
     cleaned = SyllabusSchema(
