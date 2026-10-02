@@ -24,21 +24,21 @@
       "mapped_plo": 2
     },
     {
-      "clo_id": "CLO4",
+      "clo_id": "CLO3",
       "description": "Analyze the time complexity of quicksort in the worst case.",
       "bloom_level": "Analyze",
       "ksa_category": "S",
       "mapped_plo": 3
     },
     {
-      "clo_id": "CLO5",
+      "clo_id": "CLO4",
       "description": "Demonstrate the use of dynamic programming to solve a problem.",
       "bloom_level": "Apply",
       "ksa_category": "S",
       "mapped_plo": 4
     },
     {
-      "clo_id": "CLO6",
+      "clo_id": "CLO5",
       "description": "Exhibit respect for ethical considerations in algorithm design.",
       "bloom_level": "Understand",
       "ksa_category": "A",
@@ -72,7 +72,7 @@
       "aligned_clo": [
         "CLO1",
         "CLO2",
-        "CLO4"
+        "CLO3"
       ]
     },
     {
@@ -126,7 +126,7 @@
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO4",
+        "CLO3",
         "CLO1"
       ]
     },
@@ -154,7 +154,7 @@
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -182,7 +182,7 @@
       "assessment": "Lab Rubric",
       "evidence": "Lab Output",
       "aligned_clo": [
-        "CLO6",
+        "CLO5",
         "CLO1"
       ]
     },
@@ -237,7 +237,7 @@
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO4",
+        "CLO3",
         "CLO1"
       ]
     },
@@ -265,7 +265,7 @@
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -295,9 +295,9 @@
       "aligned_clo": [
         "CLO1",
         "CLO2",
+        "CLO3",
         "CLO4",
-        "CLO5",
-        "CLO6"
+        "CLO5"
       ]
     },
     {
@@ -324,7 +324,7 @@
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
-        "CLO4",
+        "CLO3",
         "CLO1"
       ]
     },
@@ -352,8 +352,8 @@
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO5",
         "CLO4",
+        "CLO3",
         "CLO1"
       ]
     },
@@ -381,8 +381,8 @@
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
-        "CLO6",
         "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -410,7 +410,7 @@
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
-        "CLO6",
+        "CLO5",
         "CLO1"
       ]
     },
@@ -425,7 +425,7 @@
         },
         {
           "llo_id": "LLO14.2",
-          "description": "Apply a graph algorithm in a scenario where AVL trees are used to manage a graph representing a network topology.",
+          "description": "Apply AVL rotations to rebalance a tree after insertion of a node with a key that causes an imbalance.",
           "ksa_category": "S"
         },
         {
@@ -438,7 +438,7 @@
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
-        "CLO5",
+        "CLO4",
         "CLO1"
       ]
     },
@@ -466,8 +466,8 @@
       "assessment": "Recitation",
       "evidence": "Recitation Log",
       "aligned_clo": [
+        "CLO3",
         "CLO4",
-        "CLO5",
         "CLO1"
       ]
     },
@@ -495,8 +495,8 @@
       "assessment": "Quiz",
       "evidence": "Quiz Answer Sheet",
       "aligned_clo": [
+        "CLO3",
         "CLO4",
-        "CLO5",
         "CLO1"
       ]
     },
@@ -525,8 +525,8 @@
       "evidence": "Final Project + Rubric",
       "aligned_clo": [
         "CLO2",
-        "CLO6",
-        "CLO4"
+        "CLO5",
+        "CLO3"
       ]
     },
     {
@@ -555,9 +555,9 @@
       "aligned_clo": [
         "CLO1",
         "CLO2",
+        "CLO3",
         "CLO4",
-        "CLO5",
-        "CLO6"
+        "CLO5"
       ]
     }
   ]

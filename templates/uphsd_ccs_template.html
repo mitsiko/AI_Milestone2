@@ -470,7 +470,7 @@
       {% for co in payload.course_outcomes %}
         {# Print the CLO id's numeric suffix so the header matches the id
            (e.g. CLO1 -> 1, CLO4 -> 4), not the physical column position. #}
-        <th>{{ co.clo_id | replace("CLO", "") }}</th>
+        <th>{{ loop.index }}</th>
       {% endfor %}
     </tr>
   </thead>

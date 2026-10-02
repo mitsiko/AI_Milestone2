@@ -729,6 +729,32 @@ def _trim_to_five(cos: list) -> list:
     )
     return [co for idx, co in enumerate(cos) if idx != drop_index]
 
+def _renumber_clo_ids(cos: list, weeks: list | None = None):
+    """Renumber CLOs to CLO1..CLOn in list order and remap aligned_clo refs.
+
+    Called after _trim_to_five so the syllabus never ships with a gap in
+    the CLO id sequence (e.g. CLO1, CLO2, CLO4, CLO5, CLO6 -> CLO1..CLO5).
+
+    If `weeks` is provided, every aligned_clo entry is remapped through the
+    same permutation. References to ids that no longer exist are dropped
+    (should not happen given upstream integrity checks).
+
+    Returns (cos, weeks, old_to_new).
+    """
+    old_to_new = {}
+    for i, co in enumerate(cos, start=1):
+        old_to_new[co.clo_id] = f"CLO{i}"
+
+    for co in cos:
+        co.clo_id = old_to_new[co.clo_id]
+
+    if weeks is not None:
+        for wk in weeks:
+            wk.aligned_clo = [
+                old_to_new[ref] for ref in wk.aligned_clo if ref in old_to_new
+            ]
+
+    return cos, weeks, old_to_new
 
 # Replacement descriptions used by _fix_clo_ksa_balance when it has to
 # rewrite a CLO to hit the strict 2K / 2S / 1A target.
@@ -1243,6 +1269,7 @@ def generate_syllabus(course_prompt: str) -> dict:
         "pass1",
     )
     pass1.course_outcomes = _trim_to_five(pass1.course_outcomes)
+    pass1.course_outcomes, _ = _renumber_clo_ids(pass1.course_outcomes)
     pass1.course_outcomes = _distribute_plos(pass1.course_outcomes)
     pass1.course_outcomes = _fix_clo_ksa_balance(pass1.course_outcomes)
     print(f"  + {len(pass1.course_outcomes)} CLOs generated (trimmed to 5, PLOs distributed, 2K/2S/1A enforced)")
@@ -1374,6 +1401,9 @@ def reprocess_existing(path: Path) -> dict:
     payload = SyllabusSchema(**raw)
 
     payload.course_outcomes = _trim_to_five(payload.course_outcomes)
+    payload.course_outcomes, payload.weekly_schedule, _ = _renumber_clo_ids(
+        payload.course_outcomes, payload.weekly_schedule
+    )
     payload.course_outcomes = _fix_clo_ksa_balance(payload.course_outcomes)
 
     is_dsa = _is_dsa_course(
