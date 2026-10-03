@@ -982,10 +982,60 @@ def _enforce_assessment_variety(weeks: list) -> list:
         # Reassign the latest occurrence so earlier weeks keep their choice.
         donor_weeks[-1].assessment = recipient
 
+    # --- Step 3b: fill underused tools ------------------------------------
+    # The over-use loop above never pushes a tool UP, so if the LLM starved a
+    # tool (e.g. Project Rubric ended at 0), we need a second pass that steals
+    # from the most-overused tool and gives to the most-underused one.
+    # We only steal from a donor at MAX_USES and only up to MIN_USES for the
+    # recipient, so we never create a new over-use.
+    for _ in range(10):
+        counts = {t: 0 for t in ALLOWED_ASSESSMENTS}
+        for wk in non_exam:
+            counts[wk.assessment] += 1
+
+        under = [t for t in ALLOWED_ASSESSMENTS if counts[t] < MIN_USES]
+        if not under:
+            break
+
+        recipient = min(under, key=lambda t: (counts[t], ALLOWED_ASSESSMENTS.index(t)))
+
+        # Find the donor: the most-overused tool with a week we can steal from
+        # WITHOUT pushing the donor below MIN_USES.
+        donor_candidates = sorted(
+            [t for t in ALLOWED_ASSESSMENTS if t != recipient],
+            key=lambda t: -counts[t],
+        )
+        donor = None
+        donor_weeks = []
+        for t in donor_candidates:
+            if counts[t] <= MIN_USES:
+                continue
+            candidate_weeks = [w for w in non_exam if w.assessment == t]
+            if candidate_weeks:
+                donor = t
+                donor_weeks = candidate_weeks
+                break
+
+        if donor is None:
+            break
+
+        # Prefer stealing from a week whose topic would keep the recipient
+        # valid. For Project Rubric, prefer a week whose topic has a project
+        # hint so _project_tool_only_for_project_weeks leaves it alone.
+        if recipient == "Project Rubric":
+            project_weeks = [
+                w for w in donor_weeks
+                if any(h in (w.topic or "").lower() for h in _PROJECT_TOPIC_HINTS)
+            ]
+            victim = project_weeks[-1] if project_weeks else donor_weeks[-1]
+        else:
+            victim = donor_weeks[-1]
+
+        victim.assessment = recipient
+
     # --- Step 4: sanity check only (no [3, 5] assertion here) ------------
     # The final [MIN_USES, MAX_USES] balance is asserted LATER, after
-    # _project_tool_only_for_project_weeks runs. Asserting here would be
-    # checking the wrong moment.
+    # _project_tool_only_for_project_weeks runs.
     for wk in non_exam:
         if wk.assessment not in ALLOWED_ASSESSMENTS:
             raise ValueError(
@@ -1029,11 +1079,17 @@ def _project_tool_only_for_project_weeks(weeks: list) -> list:
         t = (topic or "").lower()
         return any(hint in t for hint in _PROJECT_TOPIC_HINTS)
 
-    for wk in non_exam:
-        if wk.assessment != "Project Rubric":
-            continue
+    # Count how many non-exam weeks currently carry "Project Rubric".
+    project_weeks = [w for w in non_exam if w.assessment == "Project Rubric"]
+
+    for wk in project_weeks:
         if _is_project_topic(wk.topic):
             continue
+        # Do not strip the last remaining Project Rubric week; if every
+        # project week gets reassigned, the downstream assert fails and the
+        # distribution can never converge.
+        if len([w for w in non_exam if w.assessment == "Project Rubric"]) <= 1:
+            break
         # Reassign to the least-used of the remaining three tools, counting
         # current assignments across all non-exam weeks.
         counts = {t: 0 for t in other_tools}
@@ -1269,7 +1325,7 @@ def generate_syllabus(course_prompt: str) -> dict:
         "pass1",
     )
     pass1.course_outcomes = _trim_to_five(pass1.course_outcomes)
-    pass1.course_outcomes, _ = _renumber_clo_ids(pass1.course_outcomes)
+    pass1.course_outcomes, _, _ = _renumber_clo_ids(pass1.course_outcomes)
     pass1.course_outcomes = _distribute_plos(pass1.course_outcomes)
     pass1.course_outcomes = _fix_clo_ksa_balance(pass1.course_outcomes)
     print(f"  + {len(pass1.course_outcomes)} CLOs generated (trimmed to 5, PLOs distributed, 2K/2S/1A enforced)")
